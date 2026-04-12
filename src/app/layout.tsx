@@ -49,6 +49,12 @@ export default function RootLayout({
             >
               Schedule
             </Link>
+            <Link
+              href="/history"
+              className="text-sm text-slate-400 hover:text-slate-100 transition-colors"
+            >
+              History
+            </Link>
           </div>
         </nav>
         {children}
