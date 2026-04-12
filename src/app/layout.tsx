@@ -43,6 +43,12 @@ export default function RootLayout({
             >
               Groups
             </Link>
+            <Link
+              href="/schedule"
+              className="text-sm text-slate-400 hover:text-slate-100 transition-colors"
+            >
+              Schedule
+            </Link>
           </div>
         </nav>
         {children}
