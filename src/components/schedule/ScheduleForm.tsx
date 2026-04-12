@@ -32,13 +32,14 @@ export default function ScheduleForm({ activeGroups, onScheduled }: ScheduleForm
     setLoading(true);
 
     try {
+      const scheduledForUtc = new Date(scheduledFor).toISOString();
       const res = await fetch("/api/scheduled-messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           group_id: groupId,
           content,
-          scheduled_for: scheduledFor,
+          scheduled_for: scheduledForUtc,
         }),
       });
 
