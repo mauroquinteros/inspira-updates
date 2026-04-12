@@ -88,6 +88,28 @@ export async function fetchAllGroups(
   }));
 }
 
+export async function sendTextMessage(
+  instanceName: string,
+  groupJid: string,
+  text: string
+): Promise<unknown> {
+  const res = await fetch(
+    `${env.EVOLUTION_API_BASE_URL}/message/sendText/${encodeURIComponent(instanceName)}`,
+    {
+      method: "POST",
+      headers: headers(),
+      body: JSON.stringify({ number: groupJid, text }),
+    }
+  );
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`sendTextMessage failed: ${res.status} ${body}`);
+  }
+
+  return res.json();
+}
+
 export async function getConnectionState(
   instanceName: string
 ): Promise<ConnectionStateResponse> {
