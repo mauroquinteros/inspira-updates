@@ -81,3 +81,41 @@ export async function cancelMessage(
   `;
   return rows[0] ?? null;
 }
+
+export type HistoryMessage = {
+  id: string;
+  group_name: string;
+  message_preview: string;
+  scheduled_for: Date;
+  sent_at: Date | null;
+  status: string;
+  error_message: string | null;
+  response_payload: unknown | null;
+};
+
+export async function listHistoryMessages(
+  status?: string
+): Promise<HistoryMessage[]> {
+  return db<HistoryMessage[]>`
+    SELECT
+      sm.id,
+      sg.group_name,
+      LEFT(sm.content, 80) AS message_preview,
+      sm.scheduled_for,
+      sm.sent_at,
+      sm.status,
+      me.error_message,
+      me.response_payload
+    FROM scheduled_messages sm
+    JOIN saved_groups sg ON sg.id = sm.group_id
+    LEFT JOIN message_executions me
+      ON me.id = (
+        SELECT id FROM message_executions
+        WHERE scheduled_message_id = sm.id
+        ORDER BY executed_at DESC
+        LIMIT 1
+      )
+    ${status ? db`WHERE sm.status = ${status}` : db``}
+    ORDER BY sm.scheduled_for DESC
+  `;
+}
