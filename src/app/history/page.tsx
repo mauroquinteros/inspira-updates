@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { listHistoryMessages } from "@/db/scheduledMessages";
 import HistoryView from "@/components/history/HistoryView";
 

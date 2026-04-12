@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { listSavedGroups } from "@/db/savedGroups";
 import SavedGroupsView from "./SavedGroupsView";
 

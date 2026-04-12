@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { listScheduledMessages } from "@/db/scheduledMessages";
 import { listSavedGroups } from "@/db/savedGroups";
 import ScheduleView from "@/components/schedule/ScheduleView";
