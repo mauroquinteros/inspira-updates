@@ -1,4 +1,5 @@
 import { headers as nextHeaders } from "next/headers";
+import { redirect } from "next/navigation";
 import { findUserByAuthUserId, upsertUser, type AppUser } from "@/db/users";
 import { auth } from "@/lib/auth";
 
@@ -40,4 +41,12 @@ export async function requireAppUser(request?: Request): Promise<AppUser> {
   }
 
   return upsertUser(currentUser.id, currentUser.email, currentUser.name);
+}
+
+export async function authorizePage(): Promise<AppUser> {
+  try {
+    return await requireAppUser();
+  } catch {
+    redirect("/");
+  }
 }
