@@ -1,13 +1,22 @@
 export const dynamic = "force-dynamic";
 
+import { redirect } from "next/navigation";
 import { listScheduledMessages } from "@/db/scheduledMessages";
 import { listSavedGroups } from "@/db/savedGroups";
+import { requireAppUser } from "@/lib/currentUser";
 import ScheduleView from "@/components/schedule/ScheduleView";
 
 export default async function SchedulePage() {
+  let user;
+  try {
+    user = await requireAppUser();
+  } catch {
+    redirect("/");
+  }
+
   const [messages, allGroups] = await Promise.all([
-    listScheduledMessages(),
-    listSavedGroups(),
+    listScheduledMessages(user.id),
+    listSavedGroups(user.id),
   ]);
 
   const activeGroups = allGroups.filter((g) => g.is_active);

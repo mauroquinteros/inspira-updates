@@ -2,6 +2,8 @@ import "@/lib/env"; // fail-fast: validates required env vars at startup
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Link from "next/link";
+import AuthControls from "@/components/auth/AuthControls";
+import { getCurrentUser } from "@/lib/currentUser";
 import "./globals.css";
 
 const inter = Inter({
@@ -15,11 +17,13 @@ export const metadata: Metadata = {
   description: "Scheduled WhatsApp group messages",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getCurrentUser();
+
   return (
     <html
       lang="en"
@@ -31,30 +35,40 @@ export default function RootLayout({
             <span className="text-slate-500 text-xs uppercase tracking-widest select-none">
               Inspira
             </span>
-            <Link
-              href="/session"
-              className="text-sm text-slate-400 hover:text-slate-100 transition-colors"
-            >
-              Session
-            </Link>
-            <Link
-              href="/groups"
-              className="text-sm text-slate-400 hover:text-slate-100 transition-colors"
-            >
-              Groups
-            </Link>
-            <Link
-              href="/schedule"
-              className="text-sm text-slate-400 hover:text-slate-100 transition-colors"
-            >
-              Schedule
-            </Link>
-            <Link
-              href="/history"
-              className="text-sm text-slate-400 hover:text-slate-100 transition-colors"
-            >
-              History
-            </Link>
+            {user ? (
+              <>
+                <Link
+                  href="/session"
+                  className="text-sm text-slate-400 hover:text-slate-100 transition-colors"
+                >
+                  Session
+                </Link>
+                <Link
+                  href="/groups"
+                  className="text-sm text-slate-400 hover:text-slate-100 transition-colors"
+                >
+                  Groups
+                </Link>
+                <Link
+                  href="/schedule"
+                  className="text-sm text-slate-400 hover:text-slate-100 transition-colors"
+                >
+                  Schedule
+                </Link>
+                <Link
+                  href="/history"
+                  className="text-sm text-slate-400 hover:text-slate-100 transition-colors"
+                >
+                  History
+                </Link>
+              </>
+            ) : null}
+            <div className="ml-auto">
+              <AuthControls
+                isAuthenticated={Boolean(user)}
+                userEmail={user?.email}
+              />
+            </div>
           </div>
         </nav>
         {children}

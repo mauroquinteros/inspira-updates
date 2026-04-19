@@ -1,65 +1,57 @@
-import Image from "next/image";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import AuthControls from "@/components/auth/AuthControls";
+import { getCurrentUser } from "@/lib/currentUser";
 
-export default function Home() {
+export default async function HomePage() {
+  const user = await getCurrentUser();
+
+  if (user) {
+    redirect("/session");
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+    <main className="flex flex-1 items-center justify-center bg-slate-950 px-6 py-12">
+      <div className="w-full max-w-2xl rounded-2xl border border-slate-800 bg-slate-900 p-8 text-slate-100 shadow-2xl">
+        <p className="mb-3 font-mono text-xs uppercase tracking-[0.3em] text-emerald-400">
+          Inspira Updates
+        </p>
+        <h1 className="mb-4 text-3xl font-semibold tracking-tight">
+          Sign in to manage your own WhatsApp scheduling workspace.
+        </h1>
+        <p className="mb-8 max-w-xl text-sm leading-7 text-slate-400">
+          Each Google account gets its own Evolution instance, groups, scheduled
+          messages, and history. Start by signing in, then connect WhatsApp and
+          schedule your first update.
+        </p>
+
+        <div className="mb-8 flex flex-wrap items-center gap-4">
+          <AuthControls isAuthenticated={false} />
+          <Link
+            href="https://developers.google.com/identity/protocols/oauth2"
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noreferrer"
+            className="text-sm text-slate-400 underline-offset-4 hover:text-slate-200 hover:underline"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            OAuth setup reference
+          </Link>
         </div>
-      </main>
-    </div>
+
+        <div className="grid gap-4 text-sm text-slate-400 sm:grid-cols-3">
+          <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
+            <p className="mb-2 font-medium text-slate-200">1. Sign in</p>
+            <p>Authenticate with Google and create your personal workspace.</p>
+          </div>
+          <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
+            <p className="mb-2 font-medium text-slate-200">2. Connect</p>
+            <p>Link your own WhatsApp session through a dedicated instance.</p>
+          </div>
+          <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
+            <p className="mb-2 font-medium text-slate-200">3. Schedule</p>
+            <p>Manage your groups, queue messages, and review execution history.</p>
+          </div>
+        </div>
+      </div>
+    </main>
   );
 }
