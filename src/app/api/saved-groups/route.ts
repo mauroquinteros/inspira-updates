@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { insertSavedGroup, listSavedGroups } from "@/db/savedGroups";
+import { requireAppUser } from "@/lib/currentUser";
 
 export async function GET() {
   try {
-    const groups = await listSavedGroups();
+    const user = await requireAppUser();
+    const groups = await listSavedGroups(user.id);
     return NextResponse.json(groups);
   } catch (error) {
+    if (error instanceof Error && error.message === "UNAUTHORIZED") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     console.error("[GET /api/saved-groups]", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
@@ -13,6 +18,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    const user = await requireAppUser(req);
     const body = await req.json();
     const { group_jid, group_name } = body as {
       group_jid: string;
@@ -27,6 +33,7 @@ export async function POST(req: NextRequest) {
     }
 
     const inserted = await insertSavedGroup(
+      user.id,
       group_jid,
       group_name ?? group_jid
     );
@@ -40,6 +47,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(inserted, { status: 201 });
   } catch (error) {
+    if (error instanceof Error && error.message === "UNAUTHORIZED") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     console.error("[POST /api/saved-groups]", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

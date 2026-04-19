@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { env } from "@/lib/env";
-import { getDueMessages, updateMessageStatus } from "@/db/scheduledMessages";
+import {
+  getDueMessagesWithOwnerInstance,
+  updateMessageStatus,
+} from "@/db/scheduledMessages";
 import { insertMessageExecution } from "@/db/messageExecutions";
 import { sendTextMessage } from "@/lib/evolutionClient";
 
@@ -13,7 +16,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const dueMessages = await getDueMessages();
+    const dueMessages = await getDueMessagesWithOwnerInstance();
 
     let sent = 0;
     let failed = 0;
@@ -21,9 +24,9 @@ export async function GET(req: NextRequest) {
     for (const message of dueMessages) {
       try {
         const payload = await sendTextMessage(
-          env.EVOLUTION_INSTANCE_NAME,
+          message.instance_name,
           message.group_jid,
-          message.content
+          message.content,
         );
 
         await insertMessageExecution(message.id, "sent", payload);
@@ -31,9 +34,17 @@ export async function GET(req: NextRequest) {
         sent++;
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : String(err);
-        console.error(`[cron] Failed to send message ${message.id}:`, errorMessage);
+        console.error(
+          `[cron] Failed to send message ${message.id}:`,
+          errorMessage,
+        );
 
-        await insertMessageExecution(message.id, "failed", undefined, errorMessage);
+        await insertMessageExecution(
+          message.id,
+          "failed",
+          undefined,
+          errorMessage,
+        );
         await updateMessageStatus(message.id, "failed");
         failed++;
       }
@@ -46,6 +57,9 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     console.error("[GET /api/cron/send-messages]", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

@@ -1,17 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cancelMessage } from "@/db/scheduledMessages";
 import { db } from "@/db/client";
+import { requireAppUser } from "@/lib/currentUser";
 
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const user = await requireAppUser(req);
     const { id } = await params;
 
     // Check if message exists at all first
     const existing = await db<{ id: string; status: string }[]>`
-      SELECT id, status FROM scheduled_messages WHERE id = ${id}
+      SELECT id, status
+      FROM scheduled_messages
+      WHERE id = ${id}
+        AND user_id = ${user.id}
     `;
 
     if (existing.length === 0) {
@@ -25,7 +30,7 @@ export async function DELETE(
       );
     }
 
-    const cancelled = await cancelMessage(id);
+    const cancelled = await cancelMessage(user.id, id);
     if (!cancelled) {
       // Race condition: status changed between check and update
       return NextResponse.json(
@@ -36,6 +41,9 @@ export async function DELETE(
 
     return NextResponse.json(cancelled);
   } catch (error) {
+    if (error instanceof Error && error.message === "UNAUTHORIZED") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     console.error("[DELETE /api/scheduled-messages/[id]]", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import { fetchAllGroups, getConnectionState } from "@/lib/evolutionClient";
-import { env } from "@/lib/env";
+import { getOrCreateEvolutionInstance } from "@/db/evolutionInstances";
+import { requireAppUser } from "@/lib/currentUser";
 
 export async function GET() {
   try {
-    const stateData = await getConnectionState(env.EVOLUTION_INSTANCE_NAME);
+    const user = await requireAppUser();
+    const instance = await getOrCreateEvolutionInstance(user.id);
+
+    const stateData = await getConnectionState(instance.instance_name);
     if (stateData.instance.state !== "open") {
       return NextResponse.json(
         { error: "whatsapp_disconnected" },
@@ -12,9 +16,12 @@ export async function GET() {
       );
     }
 
-    const groups = await fetchAllGroups(env.EVOLUTION_INSTANCE_NAME);
+    const groups = await fetchAllGroups(instance.instance_name);
     return NextResponse.json(groups);
   } catch (error) {
+    if (error instanceof Error && error.message === "UNAUTHORIZED") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     console.error("[GET /api/whatsapp/groups]", error);
     return NextResponse.json(
       { error: "evolution_api_unavailable" },
