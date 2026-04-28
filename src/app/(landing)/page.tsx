@@ -97,6 +97,7 @@ export default async function HomePage() {
               alt="Vista previa de Inspira Updates"
               fill
               priority
+              sizes="(max-width: 1024px) 100vw, 57vw"
               className="object-cover object-center"
             />
           </div>
