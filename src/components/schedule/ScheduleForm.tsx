@@ -1,16 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { CalendarClock, MessageSquareMore, UsersRound } from "lucide-react";
+
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { SavedGroup } from "@/db/savedGroups";
 import type { ScheduledMessage } from "@/db/scheduledMessages";
 
@@ -26,8 +23,8 @@ export default function ScheduleForm({ activeGroups, onScheduled }: ScheduleForm
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
     setError(null);
     setLoading(true);
 
@@ -44,8 +41,8 @@ export default function ScheduleForm({ activeGroups, onScheduled }: ScheduleForm
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        setError(data.error ?? "Failed to schedule message");
+        const data = await res.json().catch(() => ({}));
+        setError(data.error ?? "No pudimos guardar la programación.");
         return;
       }
 
@@ -55,81 +52,85 @@ export default function ScheduleForm({ activeGroups, onScheduled }: ScheduleForm
       setScheduledFor("");
       setGroupId("");
     } catch {
-      setError("Network error — please try again");
+      setError("Se perdió la conexión. Inténtalo nuevamente.");
     } finally {
       setLoading(false);
     }
   }
 
-  // Compute min datetime in local time (now + 1 minute)
   const minDatetime = (() => {
-    const d = new Date(Date.now() + 60_000);
-    const pad = (n: number) => String(n).padStart(2, "0");
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    const date = new Date(Date.now() + 60000);
+    const pad = (value: number) => String(value).padStart(2, "0");
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
   })();
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-1.5">
-        <label className="text-xs font-mono text-slate-400 uppercase tracking-widest">
-          Group
+    <form onSubmit={handleSubmit} className="space-y-5">
+      {activeGroups.length === 0 ? (
+        <Alert>
+          <AlertTitle>No hay grupos activos para programar</AlertTitle>
+          <AlertDescription>Activa al menos un grupo desde la sección de grupos antes de crear un envío.</AlertDescription>
+        </Alert>
+      ) : null}
+
+      <div className="space-y-2">
+        <label htmlFor="grupo-destino" className="flex items-center gap-2 text-sm font-medium text-slate-200">
+          <UsersRound className="size-4 text-[#2ae5dc]" /> Grupo destino
         </label>
-        <Select value={groupId} onValueChange={(v) => setGroupId(v ?? "")} required>
-          <SelectTrigger className="bg-slate-900 border-slate-700 text-slate-200 focus:ring-slate-600">
-            <SelectValue placeholder="Select a group…" />
+        <Select value={groupId} onValueChange={(value) => setGroupId(value ?? "")} required>
+          <SelectTrigger id="grupo-destino" className="w-full">
+            <SelectValue placeholder="Selecciona un grupo activo" />
           </SelectTrigger>
-          <SelectContent className="bg-slate-900 border-slate-700 text-slate-200">
-            {activeGroups.map((g) => (
-              <SelectItem
-                key={g.id}
-                value={g.id}
-                className="focus:bg-slate-800 focus:text-slate-100"
-              >
-                {g.group_name}
+          <SelectContent>
+            {activeGroups.map((group) => (
+              <SelectItem key={group.id} value={group.id}>
+                {group.group_name}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
+        <p className="text-xs text-slate-400">Solo se muestran los grupos que están activos para nuevos envíos.</p>
       </div>
 
-      <div className="space-y-1.5">
-        <label className="text-xs font-mono text-slate-400 uppercase tracking-widest">
-          Message
+      <div className="space-y-2">
+        <label htmlFor="mensaje-contenido" className="flex items-center gap-2 text-sm font-medium text-slate-200">
+          <MessageSquareMore className="size-4 text-[#2ae5dc]" /> Mensaje
         </label>
         <Textarea
+          id="mensaje-contenido"
           value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Type your message…"
+          onChange={(event) => setContent(event.target.value)}
+          placeholder="Escribe el mensaje que quieres enviar al grupo seleccionado"
           required
-          rows={4}
-          className="bg-slate-900 border-slate-700 text-slate-200 placeholder:text-slate-600 focus:ring-slate-600 resize-none"
+          rows={5}
         />
+        <p className="text-xs text-slate-400">Redacta un texto claro. Podrás revisarlo en la cola antes de que salga.</p>
       </div>
 
-      <div className="space-y-1.5">
-        <label className="text-xs font-mono text-slate-400 uppercase tracking-widest">
-          Send at
+      <div className="space-y-2">
+        <label htmlFor="fecha-envio" className="flex items-center gap-2 text-sm font-medium text-slate-200">
+          <CalendarClock className="size-4 text-[#2ae5dc]" /> Fecha y hora de envío
         </label>
         <Input
+          id="fecha-envio"
           type="datetime-local"
           value={scheduledFor}
-          onChange={(e) => setScheduledFor(e.target.value)}
+          onChange={(event) => setScheduledFor(event.target.value)}
           min={minDatetime}
           required
-          className="bg-slate-900 border-slate-700 text-slate-200 focus:ring-slate-600"
         />
+        <p className="text-xs text-slate-400">Elige un momento futuro con al menos un minuto de diferencia.</p>
       </div>
 
-      {error && (
-        <p className="text-xs text-red-400 font-mono">{error}</p>
-      )}
+      {error ? (
+        <Alert variant="destructive">
+          <AlertTitle>No pudimos programar el mensaje</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      ) : null}
 
-      <Button
-        type="submit"
-        disabled={loading || !groupId}
-        className="w-full bg-slate-700 hover:bg-slate-600 text-slate-100 font-mono text-sm"
-      >
-        {loading ? "Scheduling…" : "Schedule Message"}
+      <Button type="submit" disabled={loading || !groupId || activeGroups.length === 0} className="w-full">
+        {loading ? "Guardando programación..." : "Programar mensaje"}
       </Button>
     </form>
   );

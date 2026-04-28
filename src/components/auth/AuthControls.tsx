@@ -2,15 +2,18 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { LogOut, Sparkles } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
 
 type Props = {
   isAuthenticated: boolean;
   userEmail?: string;
+  compact?: boolean;
 };
 
-export default function AuthControls({ isAuthenticated, userEmail }: Props) {
+export default function AuthControls({ isAuthenticated, userEmail, compact = false }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState<"signin" | "signout" | null>(null);
 
@@ -18,7 +21,7 @@ export default function AuthControls({ isAuthenticated, userEmail }: Props) {
     setLoading("signin");
     await authClient.signIn.social({
       provider: "google",
-      callbackURL: "/session",
+      callbackURL: "/inicio",
     });
   }
 
@@ -36,26 +39,44 @@ export default function AuthControls({ isAuthenticated, userEmail }: Props) {
         type="button"
         onClick={handleSignIn}
         disabled={loading === "signin"}
-        className="bg-emerald-600 text-white hover:bg-emerald-500"
+        size={compact ? "sm" : "lg"}
+        className="gap-2"
       >
-        {loading === "signin" ? "Connecting..." : "Sign in with Google"}
+        <Sparkles className="size-4" />
+        {loading === "signin" ? "Ingresando..." : "Entrar con Google"}
+      </Button>
+    );
+  }
+
+  if (compact) {
+    return (
+      <Button
+        type="button"
+        variant="outline"
+        onClick={handleSignOut}
+        disabled={loading === "signout"}
+        size="sm"
+      >
+        <LogOut className="size-4" />
+        {loading === "signout" ? "Saliendo..." : "Salir"}
       </Button>
     );
   }
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       {userEmail ? (
-        <span className="hidden text-xs text-slate-500 sm:inline">{userEmail}</span>
+        <span className="text-xs text-slate-400">{userEmail}</span>
       ) : null}
       <Button
         type="button"
         variant="outline"
         onClick={handleSignOut}
         disabled={loading === "signout"}
-        className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-slate-100"
+        className="justify-center"
       >
-        {loading === "signout" ? "Signing out..." : "Sign out"}
+        <LogOut className="size-4" />
+        {loading === "signout" ? "Cerrando sesión..." : "Cerrar sesión"}
       </Button>
     </div>
   );

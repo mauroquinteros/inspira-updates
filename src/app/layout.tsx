@@ -1,76 +1,26 @@
-import "@/lib/env"; // fail-fast: validates required env vars at startup
+import "@/lib/env";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import Link from "next/link";
-import AuthControls from "@/components/auth/AuthControls";
-import { getCurrentUser } from "@/lib/currentUser";
 import "./globals.css";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  fallback: ["ui-sans-serif", "system-ui"],
-});
 
 export const metadata: Metadata = {
   title: "Inspira Updates",
-  description: "Scheduled WhatsApp group messages",
+  description: "Programa y supervisa mensajes de WhatsApp con un espacio de trabajo claro y elegante.",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = await getCurrentUser();
-
   return (
-    <html
-      lang="en"
-      className={`${inter.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col bg-slate-950">
-        <nav className="border-b border-slate-800 bg-slate-950 px-6 py-3 font-mono">
-          <div className="max-w-4xl mx-auto flex items-center gap-6">
-            <span className="text-slate-500 text-xs uppercase tracking-widest select-none">
-              Inspira
-            </span>
-            {user ? (
-              <>
-                <Link
-                  href="/session"
-                  className="text-sm text-slate-400 hover:text-slate-100 transition-colors"
-                >
-                  Session
-                </Link>
-                <Link
-                  href="/groups"
-                  className="text-sm text-slate-400 hover:text-slate-100 transition-colors"
-                >
-                  Groups
-                </Link>
-                <Link
-                  href="/schedule"
-                  className="text-sm text-slate-400 hover:text-slate-100 transition-colors"
-                >
-                  Schedule
-                </Link>
-                <Link
-                  href="/history"
-                  className="text-sm text-slate-400 hover:text-slate-100 transition-colors"
-                >
-                  History
-                </Link>
-              </>
-            ) : null}
-            <div className="ml-auto">
-              <AuthControls
-                isAuthenticated={Boolean(user)}
-                userEmail={user?.email}
-              />
-            </div>
-          </div>
-        </nav>
+    <html lang="es" className="h-full antialiased">
+      <body className="min-h-full bg-background text-foreground">
+        <a
+          href="#contenido-principal"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
+        >
+          Saltar al contenido
+        </a>
         {children}
       </body>
     </html>

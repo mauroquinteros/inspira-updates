@@ -1,14 +1,15 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+
 import { Button } from "@/components/ui/button";
 
 const FILTERS = [
-  { label: "All", value: "" },
-  { label: "Scheduled", value: "scheduled" },
-  { label: "Sent", value: "sent" },
-  { label: "Failed", value: "failed" },
-  { label: "Cancelled", value: "cancelled" },
+  { label: "Todos", value: "" },
+  { label: "Programados", value: "scheduled" },
+  { label: "Enviados", value: "sent" },
+  { label: "Con fallos", value: "failed" },
+  { label: "Cancelados", value: "cancelled" },
 ];
 
 interface StatusFilterProps {
@@ -33,19 +34,14 @@ export default function StatusFilter({ currentStatus }: StatusFilterProps) {
 
   return (
     <div className="flex flex-wrap gap-2">
-      {FILTERS.map((f) => (
+      {FILTERS.map((filter) => (
         <Button
-          key={f.value}
-          variant="ghost"
+          key={filter.value}
+          variant={active === filter.value ? "secondary" : "ghost"}
           size="sm"
-          onClick={() => handleFilter(f.value)}
-          className={
-            active === f.value
-              ? "font-mono text-xs bg-slate-800 text-slate-100 border border-slate-600 hover:bg-slate-700"
-              : "font-mono text-xs text-slate-500 hover:text-slate-200 hover:bg-slate-800/50"
-          }
+          onClick={() => handleFilter(filter.value)}
         >
-          {f.label}
+          {filter.label}
         </Button>
       ))}
     </div>

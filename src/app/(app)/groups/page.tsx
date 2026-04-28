@@ -6,7 +6,7 @@ import SavedGroupsView from "./SavedGroupsView";
 
 export default async function GroupsPage() {
   const user = await authorizePage();
-
   const initialGroups = await listSavedGroups(user.id);
+
   return <SavedGroupsView initialGroups={initialGroups} />;
 }

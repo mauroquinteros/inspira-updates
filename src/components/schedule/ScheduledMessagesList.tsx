@@ -1,5 +1,7 @@
 "use client";
 
+import { Clock3, XCircle } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { ScheduledMessage } from "@/db/scheduledMessages";
@@ -13,72 +15,57 @@ interface ScheduledMessagesListProps {
   onCancel: (id: string) => void;
 }
 
-const STATUS_STYLES: Record<string, string> = {
-  scheduled: "bg-sky-900/40 text-sky-300 border-sky-700",
-  sent: "bg-emerald-900/40 text-emerald-300 border-emerald-700",
-  failed: "bg-red-900/40 text-red-300 border-red-700",
-  cancelled: "bg-slate-800 text-slate-500 border-slate-700",
+const STATUS_STYLES: Record<string, { label: string; className: string }> = {
+  scheduled: { label: "Programado", className: "bg-[#2ae5dc]/12 text-[#8ef7f1] border-[#2ae5dc]/20" },
+  sent: { label: "Enviado", className: "bg-[#14e478]/12 text-[#8bf4b6] border-[#14e478]/20" },
+  failed: { label: "Falló", className: "bg-[#fe924b]/12 text-[#ffc69f] border-[#fe924b]/20" },
+  cancelled: { label: "Cancelado", className: "bg-white/6 text-slate-300 border-white/10" },
 };
 
 function formatDatetime(date: Date | string) {
-  return new Date(date).toLocaleString(undefined, {
+  return new Date(date).toLocaleString("es-PE", {
     dateStyle: "medium",
     timeStyle: "short",
   });
 }
 
-export default function ScheduledMessagesList({
-  messages,
-  onCancel,
-}: ScheduledMessagesListProps) {
+export default function ScheduledMessagesList({ messages, onCancel }: ScheduledMessagesListProps) {
   if (messages.length === 0) {
     return (
-      <p className="text-sm text-slate-600 font-mono text-center py-8">
-        No scheduled messages yet.
-      </p>
+      <div className="rounded-[1.5rem] border border-dashed border-white/12 bg-white/3 px-5 py-10 text-center">
+        <p className="text-sm font-medium text-white">Aún no tienes mensajes programados.</p>
+        <p className="mt-2 text-sm text-slate-400">Cuando crees uno, aparecerá aquí con su estado y horario.</p>
+      </div>
     );
   }
 
   return (
     <ul className="space-y-3">
-      {messages.map((msg) => (
-        <li
-          key={msg.id}
-          className="rounded-lg border border-slate-800 bg-slate-900/50 p-4 flex flex-col gap-2"
-        >
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-mono text-slate-500 mb-1">
-                {msg.group_name}
-              </p>
-              <p className="text-sm text-slate-200 leading-snug line-clamp-2">
-                {msg.content}
-              </p>
+      {messages.map((message) => {
+        const status = STATUS_STYLES[message.status] ?? STATUS_STYLES.cancelled;
+        return (
+          <li key={message.id} className="rounded-[1.45rem] border border-white/8 bg-white/4 p-4">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+              <div className="space-y-2">
+                <p className="text-xs uppercase tracking-[0.24em] text-slate-400">{message.group_name}</p>
+                <p className="text-sm leading-7 text-white">{message.content}</p>
+                <div className="inline-flex items-center gap-2 text-xs text-slate-400">
+                  <Clock3 className="size-3.5" />
+                  {formatDatetime(message.scheduled_for)}
+                </div>
+              </div>
+              <div className="flex flex-col items-start gap-2 lg:items-end">
+                <Badge className={status.className}>{status.label}</Badge>
+                {message.status === "scheduled" ? (
+                  <Button variant="ghost" size="sm" onClick={() => onCancel(message.id)}>
+                    <XCircle className="size-4" /> Cancelar
+                  </Button>
+                ) : null}
+              </div>
             </div>
-            <Badge
-              className={`shrink-0 text-xs font-mono border ${STATUS_STYLES[msg.status] ?? STATUS_STYLES.cancelled}`}
-            >
-              {msg.status}
-            </Badge>
-          </div>
-
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-xs text-slate-500 font-mono">
-              {formatDatetime(msg.scheduled_for)}
-            </span>
-            {msg.status === "scheduled" && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-xs text-slate-500 hover:text-red-400 hover:bg-red-950/30 font-mono h-7 px-2"
-                onClick={() => onCancel(msg.id)}
-              >
-                Cancel
-              </Button>
-            )}
-          </div>
-        </li>
-      ))}
+          </li>
+        );
+      })}
     </ul>
   );
 }

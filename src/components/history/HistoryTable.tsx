@@ -1,33 +1,22 @@
 "use client";
 
 import { useState } from "react";
+
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { HistoryMessage } from "@/db/scheduledMessages";
 
-const STATUS_STYLES: Record<string, string> = {
-  scheduled: "bg-slate-800 text-slate-300 border-slate-600",
-  sent: "bg-emerald-900/40 text-emerald-300 border-emerald-700",
-  failed: "bg-red-900/40 text-red-300 border-red-700",
-  cancelled: "bg-slate-800/60 text-slate-500 border-slate-700",
+const STATUS_STYLES: Record<string, { label: string; className: string }> = {
+  scheduled: { label: "Programado", className: "bg-[#2ae5dc]/12 text-[#8ef7f1] border-[#2ae5dc]/20" },
+  sent: { label: "Enviado", className: "bg-[#14e478]/12 text-[#8bf4b6] border-[#14e478]/20" },
+  failed: { label: "Falló", className: "bg-[#fe924b]/12 text-[#ffc69f] border-[#fe924b]/20" },
+  cancelled: { label: "Cancelado", className: "bg-white/6 text-slate-300 border-white/10" },
 };
 
 function formatDatetime(date: Date | string | null) {
   if (!date) return "—";
-  return new Date(date).toLocaleString(undefined, {
+  return new Date(date).toLocaleString("es-PE", {
     dateStyle: "medium",
     timeStyle: "short",
   });
@@ -42,105 +31,76 @@ export default function HistoryTable({ rows }: HistoryTableProps) {
 
   if (rows.length === 0) {
     return (
-      <p className="text-sm text-slate-600 font-mono text-center py-12">
-        No messages found.
-      </p>
+      <div className="rounded-[1.5rem] border border-dashed border-white/12 bg-white/3 px-5 py-10 text-center">
+        <p className="text-sm font-medium text-white">No encontramos registros para este filtro.</p>
+        <p className="mt-2 text-sm text-slate-400">Prueba con otro estado o revisa después de tu siguiente envío.</p>
+      </div>
     );
   }
 
-  const canShowDetail = (msg: HistoryMessage) =>
-    msg.status === "failed" && (msg.error_message || msg.response_payload);
+  const canShowDetail = (message: HistoryMessage) => message.status === "failed" && (message.error_message || message.response_payload);
 
   return (
     <>
-      <div className="rounded-lg border border-slate-800 overflow-hidden">
+      <div className="overflow-hidden rounded-[1.5rem] border border-white/8 bg-white/4">
         <Table>
           <TableHeader>
-            <TableRow className="border-slate-800 hover:bg-transparent">
-              <TableHead className="font-mono text-xs text-slate-500 uppercase tracking-widest">
-                Group
-              </TableHead>
-              <TableHead className="font-mono text-xs text-slate-500 uppercase tracking-widest">
-                Message Preview
-              </TableHead>
-              <TableHead className="font-mono text-xs text-slate-500 uppercase tracking-widest whitespace-nowrap">
-                Scheduled At
-              </TableHead>
-              <TableHead className="font-mono text-xs text-slate-500 uppercase tracking-widest whitespace-nowrap">
-                Sent At
-              </TableHead>
-              <TableHead className="font-mono text-xs text-slate-500 uppercase tracking-widest">
-                Status
-              </TableHead>
+            <TableRow className="border-white/8 hover:bg-transparent">
+              <TableHead className="text-xs uppercase tracking-[0.24em] text-slate-400">Grupo</TableHead>
+              <TableHead className="text-xs uppercase tracking-[0.24em] text-slate-400">Mensaje</TableHead>
+              <TableHead className="text-xs uppercase tracking-[0.24em] text-slate-400 whitespace-nowrap">Programado para</TableHead>
+              <TableHead className="text-xs uppercase tracking-[0.24em] text-slate-400 whitespace-nowrap">Enviado a las</TableHead>
+              <TableHead className="text-xs uppercase tracking-[0.24em] text-slate-400">Estado</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {rows.map((msg) => (
-              <TableRow
-                key={msg.id}
-                className={`border-slate-800 transition-colors ${
-                  canShowDetail(msg)
-                    ? "cursor-pointer hover:bg-red-950/20"
-                    : "hover:bg-slate-900/60"
-                }`}
-                onClick={() => canShowDetail(msg) && setSelected(msg)}
-              >
-                <TableCell className="font-mono text-xs text-slate-400 whitespace-nowrap">
-                  {msg.group_name}
-                </TableCell>
-                <TableCell className="text-sm text-slate-300 max-w-xs truncate">
-                  {msg.message_preview}
-                </TableCell>
-                <TableCell className="font-mono text-xs text-slate-500 whitespace-nowrap">
-                  {formatDatetime(msg.scheduled_for)}
-                </TableCell>
-                <TableCell className="font-mono text-xs text-slate-500 whitespace-nowrap">
-                  {formatDatetime(msg.sent_at)}
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    className={`text-xs font-mono border ${STATUS_STYLES[msg.status] ?? STATUS_STYLES.cancelled}`}
-                  >
-                    {msg.status}
-                  </Badge>
-                </TableCell>
-              </TableRow>
-            ))}
+            {rows.map((message) => {
+              const status = STATUS_STYLES[message.status] ?? STATUS_STYLES.cancelled;
+              return (
+                <TableRow
+                  key={message.id}
+                  className={canShowDetail(message) ? "cursor-pointer border-white/8 hover:bg-[#fe924b]/8" : "border-white/8 hover:bg-white/4"}
+                  onClick={() => canShowDetail(message) && setSelected(message)}
+                >
+                  <TableCell className="font-mono text-xs text-slate-300">{message.group_name}</TableCell>
+                  <TableCell className="max-w-xs text-sm text-white whitespace-normal">{message.message_preview}</TableCell>
+                  <TableCell className="font-mono text-xs text-slate-400">{formatDatetime(message.scheduled_for)}</TableCell>
+                  <TableCell className="font-mono text-xs text-slate-400">{formatDatetime(message.sent_at)}</TableCell>
+                  <TableCell>
+                    <Badge className={status.className}>{status.label}</Badge>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>
 
       <Dialog open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
-        <DialogContent className="bg-slate-900 border-slate-700 max-w-lg">
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle className="font-mono text-sm text-slate-300 uppercase tracking-widest">
-              Execution Error
-            </DialogTitle>
+            <DialogTitle>Detalle del error de ejecución</DialogTitle>
           </DialogHeader>
-          {selected && (
+          {selected ? (
             <div className="space-y-4">
-              {selected.error_message && (
+              {selected.error_message ? (
                 <div>
-                  <p className="text-xs font-mono text-slate-500 uppercase tracking-widest mb-1">
-                    Error Message
-                  </p>
-                  <p className="text-sm text-red-300 bg-red-950/30 rounded p-3 border border-red-900/40 font-mono">
+                  <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Mensaje de error</p>
+                  <p className="mt-2 rounded-[1.2rem] border border-[#fe924b]/20 bg-[#fe924b]/8 p-4 text-sm leading-6 text-slate-200">
                     {selected.error_message}
                   </p>
                 </div>
-              )}
-              {Boolean(selected.response_payload) && (
+              ) : null}
+              {selected.response_payload ? (
                 <div>
-                  <p className="text-xs font-mono text-slate-500 uppercase tracking-widest mb-1">
-                    Response Payload
-                  </p>
-                  <pre className="text-xs text-slate-300 bg-slate-800 rounded p-3 border border-slate-700 overflow-auto max-h-60 font-mono">
+                  <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Respuesta técnica</p>
+                  <pre className="mt-2 max-h-64 overflow-auto rounded-[1.2rem] border border-white/8 bg-white/4 p-4 text-xs text-slate-200">
                     {JSON.stringify(selected.response_payload as Record<string, unknown>, null, 2)}
                   </pre>
                 </div>
-              )}
+              ) : null}
             </div>
-          )}
+          ) : null}
         </DialogContent>
       </Dialog>
     </>

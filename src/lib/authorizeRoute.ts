@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import type { AppUser } from "@/db/users";
 import { requireAppUser } from "@/lib/currentUser";
 
@@ -25,18 +26,18 @@ export function authorizeRoute<TParams extends Record<string, string> = Record<s
 ) {
   return async (
     request: NextRequest,
-    context?: AuthorizeRouteContext<TParams>
+    context: AuthorizeRouteContext<TParams>
   ): Promise<Response> => {
     try {
       const user = await requireAppUser(request);
       return await handler({
         request,
         user,
-        params: context?.params ?? Promise.resolve({} as TParams),
+        params: context.params ?? Promise.resolve({} as TParams),
       });
     } catch (error) {
       if (error instanceof Error && error.message === "UNAUTHORIZED") {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        return NextResponse.json({ error: "No autorizado" }, { status: 401 });
       }
 
       if (options.onError) {
@@ -47,10 +48,7 @@ export function authorizeRoute<TParams extends Record<string, string> = Record<s
         console.error(options.logLabel, error);
       }
 
-      return NextResponse.json(
-        { error: "Internal server error" },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Ocurrió un error interno del servidor." }, { status: 500 });
     }
   };
 }
