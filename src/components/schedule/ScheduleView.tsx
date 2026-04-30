@@ -1,49 +1,19 @@
 "use client";
 
-import { CalendarRange, MessageSquareText } from "lucide-react";
-import { useState } from "react";
+import { MessageSquareText } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import ScheduleForm from "./ScheduleForm";
-import ScheduledMessagesList from "./ScheduledMessagesList";
 import type { SavedGroup } from "@/db/savedGroups";
 import type { ScheduledMessage } from "@/db/scheduledMessages";
 
-interface ScheduledMessageWithGroup extends ScheduledMessage {
-  group_name: string;
-}
-
 interface ScheduleViewProps {
   activeGroups: SavedGroup[];
-  initialMessages: ScheduledMessageWithGroup[];
 }
 
-export default function ScheduleView({ activeGroups, initialMessages }: ScheduleViewProps) {
-  const [messages, setMessages] = useState<ScheduledMessageWithGroup[]>(initialMessages);
-
-  function handleScheduled(message: ScheduledMessage) {
-    const group = activeGroups.find((item) => item.id === message.group_id);
-    const enriched: ScheduledMessageWithGroup = {
-      ...message,
-      group_name: group?.group_name ?? "Grupo no identificado",
-    };
-    setMessages((prev) => [enriched, ...prev]);
-  }
-
-  async function handleCancel(id: string) {
-    try {
-      const res = await fetch(`/api/scheduled-messages/${id}`, { method: "DELETE" });
-      if (!res.ok) {
-        console.error("No se pudo cancelar el mensaje:", await res.text());
-        return;
-      }
-
-      setMessages((prev) => prev.map((message) => (message.id === id ? { ...message, status: "cancelled" as const } : message)));
-    } catch (error) {
-      console.error("Error cancelando mensaje:", error);
-    }
-  }
+export default function ScheduleView({ activeGroups }: ScheduleViewProps) {
+  function handleScheduled(_message: ScheduledMessage) {}
 
   return (
     <div className="space-y-5">
@@ -53,7 +23,7 @@ export default function ScheduleView({ activeGroups, initialMessages }: Schedule
             <div className="space-y-3">
               <Badge className="bg-white/7 text-slate-100 border-white/10">Flujo principal</Badge>
               <div>
-                <CardTitle className="text-2xl text-white">Programa mensajes con contexto completo</CardTitle>
+                <CardTitle className="text-2xl text-white">Agenda mensajes con contexto completo</CardTitle>
                 <CardDescription>
                   Elige el grupo, redacta el mensaje y confirma la fecha sin perder de vista la cola de próximos envíos.
                 </CardDescription>
@@ -66,37 +36,20 @@ export default function ScheduleView({ activeGroups, initialMessages }: Schedule
         </CardHeader>
       </Card>
 
-      <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-3 text-white">
-              <span className="flex size-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-[#2ae5dc]">
-                <MessageSquareText className="size-5" />
-              </span>
-              Crear nuevo envío
-            </CardTitle>
-            <CardDescription>Todo el contenido y las ayudas están pensados para que programes rápido y con menos errores.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ScheduleForm activeGroups={activeGroups} onScheduled={handleScheduled} />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-3 text-white">
-              <span className="flex size-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-[#4740ff]">
-                <CalendarRange className="size-5" />
-              </span>
-              Cola de programación
-            </CardTitle>
-            <CardDescription>Consulta qué está pendiente y cancela lo necesario antes de que se envíe.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ScheduledMessagesList messages={messages} onCancel={handleCancel} />
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="bg-[#0e1136]">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-3 text-white">
+            <span className="flex size-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-[#2ae5dc]">
+              <MessageSquareText className="size-5" />
+            </span>
+            Crear nuevo envío
+          </CardTitle>
+          <CardDescription>Todo el contenido y las ayudas están pensados para que agendes rápido y con menos errores.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ScheduleForm activeGroups={activeGroups} onScheduled={handleScheduled} />
+        </CardContent>
+      </Card>
     </div>
   );
 }

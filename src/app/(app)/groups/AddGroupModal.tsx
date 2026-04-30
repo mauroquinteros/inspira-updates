@@ -1,12 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LoaderCircle, Search, UsersRound } from "lucide-react";
+import { LoaderCircle, Search, UserPlus2, UsersRound, X } from "lucide-react";
 
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import type { SavedGroup } from "@/db/savedGroups";
 
@@ -50,7 +47,11 @@ export default function AddGroupModal({ open, onClose, onAdd }: Props) {
       .finally(() => setLoading(false));
   }, [open]);
 
-  const filtered = groups.filter((group) => group.name.toLowerCase().includes(search.toLowerCase()));
+  const filtered = groups.filter(
+    (g) =>
+      g.name.toLowerCase().includes(search.toLowerCase()) ||
+      g.jid.toLowerCase().includes(search.toLowerCase())
+  );
 
   async function handleSave(group: EvolutionGroup) {
     setSaving(group.jid);
@@ -84,71 +85,112 @@ export default function AddGroupModal({ open, onClose, onAdd }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={(value) => !value && onClose()}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Agregar grupo</DialogTitle>
-          <DialogDescription>Busca entre los grupos disponibles de tu sesión conectada y guárdalos para futuras campañas.</DialogDescription>
-        </DialogHeader>
+      <DialogContent className="flex max-h-[85dvh] flex-col gap-0 p-0 sm:max-w-xl !bg-[#1A1A3E] !backdrop-blur-none [&>button]:hidden">
+        {/* Header */}
+        <div className="flex shrink-0 items-center justify-between border-b border-white/8 px-6 py-5">
+          <div className="flex items-center gap-3">
+            <UserPlus2 className="size-5 text-[#2ae5dc]" />
+            <span className="text-xl font-semibold text-white">Agregar grupo</span>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-slate-400 transition-colors hover:text-white"
+            aria-label="Cerrar"
+          >
+            <X className="size-5" />
+          </button>
+        </div>
 
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="buscar-grupo" className="text-sm font-medium text-slate-200">Buscar grupo</label>
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-slate-500" />
-              <Input
-                id="buscar-grupo"
-                placeholder="Escribe el nombre del grupo"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+        {/* Scrollable body */}
+        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-6">
+          {/* Search */}
+          <div className="relative shrink-0">
+            <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-slate-500" />
+            <input
+              type="text"
+              placeholder="Buscar grupos por nombre o ID..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded-full border border-white/10 bg-white/8 py-3 pl-11 pr-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-[#2ae5dc]/50"
+            />
           </div>
 
-          {error ? (
-            <Alert variant="destructive">
+          {/* Loading hint */}
+          {loading && (
+            <p className="shrink-0 text-center text-sm leading-5 text-slate-400">
+              La primera sincronización puede tardar unos segundos — WhatsApp procesa todos tus grupos antes de enviárnoslos.
+            </p>
+          )}
+
+          {/* Error */}
+          {error && (
+            <Alert variant="destructive" className="shrink-0">
               <AlertTitle>No pudimos completar la carga</AlertTitle>
               <AlertDescription>{error}</AlertDescription>
             </Alert>
-          ) : null}
+          )}
 
-          <div className="max-h-80 space-y-2 overflow-y-auto pr-1">
-            {loading
-              ? Array.from({ length: 5 }).map((_, index) => <Skeleton key={index} className="h-16 w-full rounded-[1.2rem]" />)
-              : null}
+          {/* Group list */}
+          <div className="space-y-2">
+            {loading &&
+              Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="h-16 animate-pulse rounded-xl border border-white/8 bg-white/4" />
+              ))}
 
-            {!loading && !error && filtered.length === 0 ? (
-              <div className="rounded-[1.35rem] border border-dashed border-white/12 bg-white/3 py-10 text-center">
+            {!loading && !error && filtered.length === 0 && (
+              <div className="rounded-xl border border-dashed border-white/12 bg-white/3 py-10 text-center">
                 <div className="mx-auto flex size-12 items-center justify-center rounded-full border border-white/10 bg-white/4 text-slate-300">
                   <UsersRound className="size-5" />
                 </div>
                 <p className="mt-4 text-sm font-medium text-white">No encontramos coincidencias.</p>
-                <p className="mt-2 text-sm text-slate-400">Prueba con otro nombre o revisa tu conexión.</p>
+                <p className="mt-1 text-sm text-slate-400">Prueba con otro nombre o revisa tu conexión.</p>
               </div>
-            ) : null}
+            )}
 
             {!loading &&
               filtered.map((group) => {
                 const alreadySaved = savedJids.has(group.jid);
+                const isSaving = saving === group.jid;
                 return (
-                  <div key={group.jid} className="flex items-center justify-between gap-3 rounded-[1.25rem] border border-white/8 bg-white/4 px-4 py-3">
+                  <div
+                    key={group.jid}
+                    className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/6 px-4 py-3"
+                  >
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium text-white">{group.name}</p>
-                      <p className="truncate font-mono text-xs text-slate-400">{group.jid}</p>
+                      <p className="truncate font-mono text-xs text-slate-400">ID: {group.jid}</p>
                     </div>
-                    <Button
-                      size="sm"
-                      variant={alreadySaved ? "secondary" : "outline"}
-                      disabled={saving === group.jid || alreadySaved}
+                    <button
+                      disabled={isSaving || alreadySaved}
                       onClick={() => handleSave(group)}
+                      className={`shrink-0 rounded-lg px-4 py-1.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed ${
+                        alreadySaved
+                          ? "border border-[#2ae5dc] bg-transparent text-[#2ae5dc]"
+                          : "bg-[#2ae5dc] text-[#040535] hover:bg-[#2ae5dc]/80"
+                      }`}
                     >
-                      {saving === group.jid ? <LoaderCircle className="size-4 animate-spin" /> : null}
-                      {alreadySaved ? "Guardado" : saving === group.jid ? "Guardando..." : "Guardar"}
-                    </Button>
+                      {isSaving ? (
+                        <LoaderCircle className="size-4 animate-spin" />
+                      ) : alreadySaved ? (
+                        "Guardado"
+                      ) : (
+                        "Guardar"
+                      )}
+                    </button>
                   </div>
                 );
               })}
           </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex shrink-0 justify-end border-t border-white/8 px-6 py-4">
+          <button
+            onClick={onClose}
+            className="text-sm text-slate-400 transition-colors hover:text-white"
+          >
+            Cancelar
+          </button>
         </div>
       </DialogContent>
     </Dialog>

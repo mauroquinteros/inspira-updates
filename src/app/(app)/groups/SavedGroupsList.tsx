@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { Info, MessageSquare, Trash2, UsersRound } from "lucide-react";
 
 import type { SavedGroup } from "@/db/savedGroups";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface Props {
   groups: SavedGroup[];
@@ -29,60 +27,74 @@ export default function SavedGroupsList({ groups, onToggle, onRemove }: Props) {
     setLoadingRemove(null);
   }
 
-  if (groups.length === 0) {
-    return (
-      <div className="rounded-[1.5rem] border border-dashed border-white/12 bg-white/3 py-12 text-center">
-        <p className="text-sm font-medium text-white">Todavía no guardaste grupos.</p>
-        <p className="mt-2 text-sm text-slate-400">Usa “Agregar grupo” para importar uno desde tu sesión conectada.</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="overflow-hidden rounded-[1.5rem] border border-white/8 bg-white/4">
-      <Table>
-        <TableHeader>
-          <TableRow className="border-white/8 hover:bg-transparent">
-            <TableHead className="text-xs uppercase tracking-[0.24em] text-slate-400">Nombre</TableHead>
-            <TableHead className="hidden text-xs uppercase tracking-[0.24em] text-slate-400 sm:table-cell">Identificador</TableHead>
-            <TableHead className="text-xs uppercase tracking-[0.24em] text-slate-400">Estado</TableHead>
-            <TableHead className="text-right text-xs uppercase tracking-[0.24em] text-slate-400">Acciones</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
+    <div className="rounded-[1.5rem] border border-white/8 bg-white/3">
+      {/* Card header */}
+      <div className="flex items-center gap-4 border-b border-white/8 p-6">
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-[0.9rem] border border-white/10 bg-[#2ae5dc]/10 text-[#2ae5dc]">
+          <UsersRound className="size-5" />
+        </span>
+        <div>
+          <p className="text-base font-semibold text-white">Biblioteca de grupos</p>
+          <p className="text-sm text-slate-400">Activa o desactiva grupos según la campaña que quieras lanzar.</p>
+        </div>
+      </div>
+
+      {groups.length === 0 ? (
+        <div className="px-6 py-12 text-center">
+          <p className="text-sm font-medium text-white">Todavía no guardaste grupos.</p>
+          <p className="mt-2 text-sm text-slate-400">Usa &quot;Agregar grupo&quot; para importar uno desde tu sesión conectada.</p>
+        </div>
+      ) : (
+        <>
+          {/* Table header */}
+          <div className="grid grid-cols-[1fr_1fr_120px_180px] gap-4 border-b border-white/8 px-6 py-3">
+            <span className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-slate-400">Nombre</span>
+            <span className="hidden text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-slate-400 sm:block">Identificador</span>
+            <span className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-slate-400">Estado</span>
+            <span className="text-right text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-slate-400">Acciones</span>
+          </div>
+
+          {/* Rows */}
           {groups.map((group) => (
-            <TableRow key={group.id} className="border-white/8 hover:bg-white/4">
-              <TableCell className="text-sm font-medium text-white">{group.group_name}</TableCell>
-              <TableCell className="hidden font-mono text-xs text-slate-400 sm:table-cell">{group.group_jid}</TableCell>
-              <TableCell>
-                <Badge className={group.is_active ? "bg-[#14e478]/12 text-[#8bf4b6] border-[#14e478]/20" : "bg-white/6 text-slate-300 border-white/10"}>
-                  {group.is_active ? "Activo" : "Pausado"}
-                </Badge>
-              </TableCell>
-              <TableCell className="text-right">
-                <div className="flex items-center justify-end gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={loadingToggle === group.id}
-                    onClick={() => handleToggle(group)}
-                  >
-                    {loadingToggle === group.id ? "Actualizando..." : group.is_active ? "Pausar" : "Activar"}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    disabled={loadingRemove === group.id}
-                    onClick={() => handleRemove(group.id)}
-                  >
-                    {loadingRemove === group.id ? "Eliminando..." : "Eliminar"}
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
+            <div
+              key={group.id}
+              className="grid grid-cols-[1fr_1fr_120px_180px] items-center gap-4 border-b border-white/8 px-6 py-4 last:border-b-0 hover:bg-white/3"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <span className="truncate text-sm font-medium text-white">{group.group_name}</span>
+              </div>
+
+              <span className="hidden truncate font-mono text-xs text-slate-400 sm:block">{group.group_jid}</span>
+
+              <span className="inline-flex items-center gap-1.5 text-sm">
+                <span className={`size-2 shrink-0 rounded-full ${group.is_active ? "bg-[#14e478]" : "bg-slate-500"}`} />
+                <span className={group.is_active ? "text-[#8bf4b6]" : "text-slate-400"}>
+                  {group.is_active ? "Activo" : "Desactivado"}
+                </span>
+              </span>
+
+              <div className="flex items-center justify-end gap-4">
+                <button
+                  disabled={loadingToggle === group.id}
+                  onClick={() => handleToggle(group)}
+                  className="text-sm text-slate-300 transition-colors hover:text-white disabled:opacity-50"
+                >
+                  {loadingToggle === group.id ? "Actualizando..." : group.is_active ? "Desactivar" : "Activar"}
+                </button>
+                <button
+                  disabled={loadingRemove === group.id}
+                  onClick={() => handleRemove(group.id)}
+                  className="inline-flex items-center gap-1.5 text-sm text-[#fe924b] transition-colors hover:text-orange-300 disabled:opacity-50"
+                >
+                  <Trash2 className="size-3.5" />
+                  {loadingRemove === group.id ? "Eliminando..." : "Eliminar"}
+                </button>
+              </div>
+            </div>
           ))}
-        </TableBody>
-      </Table>
+        </>
+      )}
     </div>
   );
 }

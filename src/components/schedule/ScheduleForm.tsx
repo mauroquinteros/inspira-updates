@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { CalendarClock, MessageSquareMore, UsersRound } from "lucide-react";
+import { format } from "date-fns";
+import { CalendarDays, MessageSquare, SendHorizonal, UsersRound } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import type { SavedGroup } from "@/db/savedGroups";
 import type { ScheduledMessage } from "@/db/scheduledMessages";
 
@@ -19,37 +21,44 @@ interface ScheduleFormProps {
 export default function ScheduleForm({ activeGroups, onScheduled }: ScheduleFormProps) {
   const [groupId, setGroupId] = useState("");
   const [content, setContent] = useState("");
-  const [scheduledFor, setScheduledFor] = useState("");
+  const [date, setDate] = useState<Date | undefined>(undefined);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [time, setTime] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
+    if (!date || !time) return;
     setError(null);
     setLoading(true);
 
     try {
-      const scheduledForUtc = new Date(scheduledFor).toISOString();
+      const [hours, minutes] = time.split(":").map(Number);
+      const scheduled = new Date(date);
+      scheduled.setHours(hours, minutes, 0, 0);
+
       const res = await fetch("/api/scheduled-messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           group_id: groupId,
           content,
-          scheduled_for: scheduledForUtc,
+          scheduled_for: scheduled.toISOString(),
         }),
       });
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setError(data.error ?? "No pudimos guardar la programación.");
+        setError(data.error ?? "No pudimos guardar el mensaje agendado.");
         return;
       }
 
       const message = await res.json();
       onScheduled(message as ScheduledMessage);
       setContent("");
-      setScheduledFor("");
+      setDate(undefined);
+      setTime("");
       setGroupId("");
     } catch {
       setError("Se perdió la conexión. Inténtalo nuevamente.");
@@ -58,80 +67,120 @@ export default function ScheduleForm({ activeGroups, onScheduled }: ScheduleForm
     }
   }
 
-  const minDatetime = (() => {
-    const date = new Date(Date.now() + 60000);
-    const pad = (value: number) => String(value).padStart(2, "0");
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-  })();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const isDisabled = loading || !groupId || !content || !date || !time || activeGroups.length === 0;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      {activeGroups.length === 0 ? (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {activeGroups.length === 0 && (
         <Alert>
-          <AlertTitle>No hay grupos activos para programar</AlertTitle>
+          <AlertTitle>No hay grupos activos para agendar mensajes</AlertTitle>
           <AlertDescription>Activa al menos un grupo desde la sección de grupos antes de crear un envío.</AlertDescription>
         </Alert>
-      ) : null}
+      )}
 
+      {/* Group */}
       <div className="space-y-2">
-        <label htmlFor="grupo-destino" className="flex items-center gap-2 text-sm font-medium text-slate-200">
-          <UsersRound className="size-4 text-[#2ae5dc]" /> Grupo destino
+        <label htmlFor="grupo-destino" className="flex items-center gap-2 text-sm font-medium text-[#2ae5dc]">
+          <UsersRound className="size-4" /> Seleccionar Grupo
         </label>
-        <Select value={groupId} onValueChange={(value) => setGroupId(value ?? "")} required>
-          <SelectTrigger id="grupo-destino" className="w-full">
-            <SelectValue placeholder="Selecciona un grupo activo" />
+        <Select value={groupId} onValueChange={(v) => setGroupId(v ?? "")} required>
+          <SelectTrigger id="grupo-destino" className="w-full bg-white/8">
+            <SelectValue placeholder="Selecciona un grupo..." />
           </SelectTrigger>
           <SelectContent>
             {activeGroups.map((group) => (
-              <SelectItem key={group.id} value={group.id}>
+              <SelectItem
+                key={group.id}
+                value={group.id}
+                className="py-2 pl-3 focus:bg-[#2ae5dc]/15 focus:text-white"
+              >
                 {group.group_name}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <p className="text-xs text-slate-400">Solo se muestran los grupos que están activos para nuevos envíos.</p>
+        <p className="text-xs text-slate-400">Selecciona el grupo al que deseas enviar el mensaje.</p>
       </div>
 
+      {/* Message */}
       <div className="space-y-2">
-        <label htmlFor="mensaje-contenido" className="flex items-center gap-2 text-sm font-medium text-slate-200">
-          <MessageSquareMore className="size-4 text-[#2ae5dc]" /> Mensaje
+        <label htmlFor="mensaje-contenido" className="flex items-center gap-2 text-sm font-medium text-[#2ae5dc]">
+          <MessageSquare className="size-4" /> Mensaje
         </label>
         <Textarea
           id="mensaje-contenido"
           value={content}
-          onChange={(event) => setContent(event.target.value)}
-          placeholder="Escribe el mensaje que quieres enviar al grupo seleccionado"
+          onChange={(e) => setContent(e.target.value)}
+          placeholder="Escribe el contenido del mensaje aquí..."
           required
-          rows={5}
+          rows={8}
+          className="bg-white/8"
         />
-        <p className="text-xs text-slate-400">Redacta un texto claro. Podrás revisarlo en la cola antes de que salga.</p>
+        <p className="text-xs text-slate-400">Escribe un texto claro. Podrás revisarlo en la cola antes de que salga.</p>
       </div>
 
-      <div className="space-y-2">
-        <label htmlFor="fecha-envio" className="flex items-center gap-2 text-sm font-medium text-slate-200">
-          <CalendarClock className="size-4 text-[#2ae5dc]" /> Fecha y hora de envío
-        </label>
-        <Input
-          id="fecha-envio"
-          type="datetime-local"
-          value={scheduledFor}
-          onChange={(event) => setScheduledFor(event.target.value)}
-          min={minDatetime}
-          required
-        />
-        <p className="text-xs text-slate-400">Elige un momento futuro con al menos un minuto de diferencia.</p>
+      {/* Date + Time */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 text-sm font-medium text-[#2ae5dc]">
+            <CalendarDays className="size-4" /> Fecha de Envío
+          </label>
+          <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+            <PopoverTrigger className="flex w-full items-center justify-between rounded-full border border-border bg-white/8 px-4 py-2 text-sm font-normal transition-colors hover:bg-white/12">
+              <span className={date ? "text-white" : "text-slate-500"}>
+                {date ? format(date, "dd/MM/yyyy") : "dd/mm/yyyy"}
+              </span>
+              <CalendarDays className="size-4 text-slate-400" />
+            </PopoverTrigger>
+            <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={date}
+                captionLayout="dropdown"
+                defaultMonth={date}
+                onSelect={(d) => { setDate(d); setCalendarOpen(false); }}
+                disabled={(d) => d < today}
+              />
+            </PopoverContent>
+          </Popover>
+          <p className="text-xs text-slate-400">Elige el día de envío.</p>
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="hora-envio" className="flex items-center gap-2 text-sm font-medium text-[#2ae5dc]">
+            <MessageSquare className="size-4" /> Hora de Envío
+          </label>
+          <Input
+            id="hora-envio"
+            type="time"
+            step="1"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            required
+            className="bg-white/8 appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+          />
+          <p className="text-xs text-slate-400">Define la hora exacta (mínimo 1 min de diferencia).</p>
+        </div>
       </div>
 
-      {error ? (
+      {error && (
         <Alert variant="destructive">
-          <AlertTitle>No pudimos programar el mensaje</AlertTitle>
+          <AlertTitle>No pudimos agendar el mensaje</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
-      ) : null}
+      )}
 
-      <Button type="submit" disabled={loading || !groupId || activeGroups.length === 0} className="w-full">
-        {loading ? "Guardando programación..." : "Programar mensaje"}
-      </Button>
+      <button
+        type="submit"
+        disabled={isDisabled}
+        className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#2ae5dc] py-3 text-sm font-semibold text-[#040535] transition-colors hover:bg-[#2ae5dc]/80 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <SendHorizonal className="size-4" />
+        {loading ? "Guardando mensaje agendado..." : "Agendar mensaje"}
+      </button>
     </form>
   );
 }

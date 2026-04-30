@@ -46,7 +46,7 @@ export const POST = authorizeRoute(async ({ request, user }) => {
   }
 
   if (!groups[0].is_active) {
-    return NextResponse.json({ error: "El grupo seleccionado está pausado." }, { status: 400 });
+    return NextResponse.json({ error: "El grupo seleccionado está desactivado." }, { status: 400 });
   }
 
   const message = await insertScheduledMessage(user.id, group_id, content.trim(), scheduledDate);
