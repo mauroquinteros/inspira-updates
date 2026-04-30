@@ -141,39 +141,10 @@ export type HistoryMessage = {
 };
 
 export async function listHistoryMessages(
-  user_id_or_status?: string,
-  maybe_status?: string
+  user_id: string,
+  status?: string
 ): Promise<HistoryMessage[]> {
-  const user_id = maybe_status ? user_id_or_status : null;
-  const status = maybe_status ?? user_id_or_status;
-
-  if (user_id) {
-    return db<HistoryMessage[]>`
-      SELECT
-        sm.id,
-        sg.group_name,
-        LEFT(sm.content, 80) AS message_preview,
-        sm.scheduled_for,
-        sm.sent_at,
-        sm.status,
-        me.error_message,
-        me.response_payload
-      FROM scheduled_messages sm
-      JOIN saved_groups sg ON sg.id = sm.group_id
-      LEFT JOIN message_executions me
-        ON me.id = (
-          SELECT id FROM message_executions
-          WHERE scheduled_message_id = sm.id
-          ORDER BY executed_at DESC
-          LIMIT 1
-        )
-      WHERE sm.user_id = ${user_id}
-      ${status ? db`AND sm.status = ${status}` : db``}
-      ORDER BY sm.scheduled_for DESC
-    `;
-  }
-
-  return db<HistoryMessage[]>`
+  return await db<HistoryMessage[]>`
     SELECT
       sm.id,
       sg.group_name,
@@ -192,7 +163,8 @@ export async function listHistoryMessages(
         ORDER BY executed_at DESC
         LIMIT 1
       )
-    ${status ? db`WHERE sm.status = ${status}` : db``}
+    WHERE sm.user_id = ${user_id}
+    ${status ? db`AND sm.status = ${status}` : db``}
     ORDER BY sm.scheduled_for DESC
   `;
 }
