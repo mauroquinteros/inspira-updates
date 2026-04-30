@@ -6,6 +6,7 @@ export type EvolutionGroup = { jid: string; name: string };
 
 interface QRResponse {
   code: string;
+  base64?: string;
   pairingCode?: string;
 }
 
@@ -61,6 +62,7 @@ export async function getQR(instanceName: string): Promise<QRResponse> {
   const data = await res.json();
   return {
     code: data.code as string,
+    base64: data.base64 as string | undefined,
     pairingCode: data.pairingCode as string | undefined,
   };
 }

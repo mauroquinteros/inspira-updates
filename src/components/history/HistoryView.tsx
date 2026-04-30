@@ -67,7 +67,7 @@ export default function HistoryView({ initialMessages, status }: HistoryViewProp
         </CardHeader>
       </Card>
 
-      <Card>
+      <Card className="bg-[#0e1136]">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-white">
             <span className="flex size-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-[#2ae5dc]">

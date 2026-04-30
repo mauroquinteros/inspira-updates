@@ -32,7 +32,7 @@ export default async function HomePage() {
               Inspira Updates
             </span>
           </Link>
-          <AuthControls isAuthenticated={false} compact />
+          <AuthControls isAuthenticated={false} />
         </div>
       </header>
 

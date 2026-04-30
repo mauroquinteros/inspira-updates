@@ -97,7 +97,7 @@ export default function SessionScreen() {
               <Badge className={STATE_STYLES[state]}>{STATE_LABELS[state]}</Badge>
               <CardTitle className="text-2xl text-white">Conecta tu sesión de WhatsApp</CardTitle>
               <CardDescription>
-                Escanea el código desde tu teléfono para habilitar los envíos programados en este espacio.
+                Escanea el código desde tu teléfono para habilitar los envíos agendados en este espacio.
               </CardDescription>
             </div>
             <Button variant="outline" onClick={initSession} disabled={loading}>
@@ -125,7 +125,7 @@ export default function SessionScreen() {
                 </div>
                 <p className="mt-5 text-lg font-semibold text-white">Sesión conectada</p>
                 <p className="mt-2 max-w-[220px] text-sm leading-6 text-slate-300">
-                  Ya puedes guardar grupos y programar mensajes desde el panel principal.
+                  Ya puedes guardar grupos y agendar mensajes desde el panel principal.
                 </p>
               </div>
             ) : (

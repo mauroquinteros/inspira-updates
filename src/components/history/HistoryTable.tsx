@@ -42,7 +42,7 @@ export default function HistoryTable({ rows }: HistoryTableProps) {
 
   return (
     <>
-      <div className="overflow-hidden rounded-[1.5rem] border border-white/8 bg-white/4">
+      <div className="overflow-hidden rounded-[1.5rem] border border-white/8 bg-white/8">
         <Table>
           <TableHeader>
             <TableRow className="border-white/8 hover:bg-transparent">
