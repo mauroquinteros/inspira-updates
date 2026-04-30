@@ -85,7 +85,7 @@ export default function AddGroupModal({ open, onClose, onAdd }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={(value) => !value && onClose()}>
-      <DialogContent className="flex max-h-[85dvh] flex-col gap-0 p-0 sm:max-w-xl !bg-[#1A1A3E] !backdrop-blur-none [&>button]:hidden">
+      <DialogContent className="flex max-h-[85dvh] flex-col gap-0 p-0 sm:max-w-xl bg-[#1A1A3E] backdrop-blur-none [&>button]:hidden">
         {/* Header */}
         <div className="flex shrink-0 items-center justify-between border-b border-white/8 px-6 py-5">
           <div className="flex items-center gap-3">

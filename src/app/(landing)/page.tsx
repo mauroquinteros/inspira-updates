@@ -25,7 +25,7 @@ export default async function HomePage() {
       <header className="sticky top-0 z-50 border-b border-white/8 bg-[#040535]/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
           <Link href="/" className="inline-flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-[1.3rem] bg-gradient-to-br from-[#2ae5dc] via-[#0f3994] to-[#4740ff] shadow-[0_8px_24px_rgba(42,229,220,0.22)]">
+            <div className="flex size-10 items-center justify-center rounded-[1.3rem] bg-linear-to-br from-[#2ae5dc] via-[#0f3994] to-[#4740ff] shadow-[0_8px_24px_rgba(42,229,220,0.22)]">
               <MessagesSquare className="size-4.5 text-white" />
             </div>
             <span className="font-heading text-base font-semibold text-white">
@@ -74,7 +74,7 @@ export default async function HomePage() {
                   <p className="text-base font-semibold text-white">
                     {step.label}
                   </p>
-                  <p className="max-w-[90px] text-sm leading-5 text-slate-400">
+                  <p className="max-w-22.5 text-sm leading-5 text-slate-400">
                     {step.desc}
                   </p>
                 </div>
@@ -91,7 +91,7 @@ export default async function HomePage() {
         {/* Right */}
         <div className="relative flex flex-col gap-4">
           <div className="pointer-events-none absolute inset-0 rounded-3xl bg-[radial-gradient(circle_at_50%_50%,rgba(42,229,220,0.12),transparent_60%),radial-gradient(circle_at_80%_20%,rgba(71,64,255,0.18),transparent_50%)] blur-2xl" />
-          <div className="relative h-[420px] overflow-hidden rounded-3xl lg:h-[520px]">
+          <div className="relative h-105 overflow-hidden rounded-3xl lg:h-130">
             <Image
               src="/inspira-updates-hero.webp"
               alt="Vista previa de Inspira Updates"
@@ -151,7 +151,7 @@ export default async function HomePage() {
           <div className="grid gap-10 lg:grid-cols-3">
             <div className="space-y-4">
               <div className="flex items-center gap-2.5">
-                <div className="flex size-9 items-center justify-center rounded-[1rem] bg-gradient-to-br from-[#2ae5dc] via-[#0f3994] to-[#4740ff]">
+                <div className="flex size-9 items-center justify-center rounded-[1rem] bg-linear-to-br from-[#2ae5dc] via-[#0f3994] to-[#4740ff]">
                   <MessagesSquare className="size-4 text-white" />
                 </div>
                 <span className="font-heading text-sm font-semibold text-white">
