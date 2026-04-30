@@ -119,7 +119,7 @@ export default function ScheduleForm({ activeGroups, onScheduled }: ScheduleForm
           rows={8}
           className="bg-white/8"
         />
-        <p className="text-xs text-slate-400">Escribe un texto claro. Podrás revisarlo en la cola antes de que salga.</p>
+        <p className="text-xs text-slate-400">Escribe un texto claro. Si quieres poner una frase en negrita, agrega un * al inicio y otro al final.</p>
       </div>
 
       {/* Date + Time */}
