@@ -1,7 +1,6 @@
 -- users: app-level ownership model mapped from auth identities
 CREATE TABLE IF NOT EXISTS users (
-  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  auth_user_id  TEXT UNIQUE NOT NULL,
+  id            UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email         TEXT UNIQUE NOT NULL,
   name          TEXT NULL,
   created_at    TIMESTAMP NOT NULL DEFAULT NOW(),
