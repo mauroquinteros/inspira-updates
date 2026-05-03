@@ -1,7 +1,8 @@
-import { headers as nextHeaders } from "next/headers";
 import { redirect } from "next/navigation";
-import { findUserByAuthUserId, upsertUser, type AppUser } from "@/db/users";
-import { auth } from "@/lib/auth";
+import type { User } from "@supabase/supabase-js";
+
+import { upsertUser, type AppUser } from "@/db/users";
+import { createClient } from "@/lib/supabase/server";
 
 export type CurrentUser = {
   id: string;
@@ -9,18 +10,37 @@ export type CurrentUser = {
   name?: string | null;
 };
 
-export async function getCurrentUser(request?: Request): Promise<CurrentUser | null> {
-  const headers = request ? request.headers : await nextHeaders();
-  const session = await auth.api.getSession({ headers });
+function getDisplayName(user: User): string | null {
+  const metadata = user.user_metadata;
 
-  if (!session?.user) {
+  if (!metadata || typeof metadata !== "object") {
+    return null;
+  }
+
+  const fullName =
+    ("full_name" in metadata && typeof metadata.full_name === "string" && metadata.full_name) ||
+    ("name" in metadata && typeof metadata.name === "string" && metadata.name) ||
+    null;
+
+  return fullName;
+}
+
+export async function getCurrentUser(request?: Request): Promise<CurrentUser | null> {
+  void request;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
     return null;
   }
 
   return {
-    id: session.user.id,
-    email: session.user.email,
-    name: session.user.name,
+    id: user.id,
+    email: user.email,
+    name: getDisplayName(user),
   };
 }
 
@@ -34,12 +54,6 @@ export async function requireAuth(request?: Request): Promise<CurrentUser> {
 
 export async function requireAppUser(request?: Request): Promise<AppUser> {
   const currentUser = await requireAuth(request);
-  const existing = await findUserByAuthUserId(currentUser.id);
-
-  if (existing) {
-    return existing;
-  }
-
   return upsertUser(currentUser.id, currentUser.email, currentUser.name);
 }
 

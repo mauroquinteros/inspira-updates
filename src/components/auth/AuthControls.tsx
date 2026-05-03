@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { LogOut, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
+import { createClient } from "@/lib/supabase/browser";
 
 type Props = {
   isAuthenticated: boolean;
@@ -16,18 +16,22 @@ type Props = {
 export default function AuthControls({ isAuthenticated, userEmail, compact = false }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState<"signin" | "signout" | null>(null);
+  const supabase = createClient();
 
   async function handleSignIn() {
     setLoading("signin");
-    await authClient.signIn.social({
+    await supabase.auth.signInWithOAuth({
       provider: "google",
-      callbackURL: "/inicio",
+      options: {
+        redirectTo: new URL("/auth/callback?next=/inicio", window.location.origin).toString(),
+      },
     });
+    setLoading(null);
   }
 
   async function handleSignOut() {
     setLoading("signout");
-    await authClient.signOut();
+    await supabase.auth.signOut();
     router.push("/");
     router.refresh();
     setLoading(null);
