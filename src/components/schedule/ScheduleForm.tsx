@@ -18,12 +18,17 @@ interface ScheduleFormProps {
   onScheduled: (message: ScheduledMessage) => void;
 }
 
+function nowTimeString() {
+  const now = new Date();
+  return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+}
+
 export default function ScheduleForm({ activeGroups, onScheduled }: ScheduleFormProps) {
   const [groupId, setGroupId] = useState("");
   const [content, setContent] = useState("");
-  const [date, setDate] = useState<Date | undefined>(undefined);
+  const [date, setDate] = useState<Date | undefined>(() => new Date());
   const [calendarOpen, setCalendarOpen] = useState(false);
-  const [time, setTime] = useState("");
+  const [time, setTime] = useState(() => nowTimeString());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

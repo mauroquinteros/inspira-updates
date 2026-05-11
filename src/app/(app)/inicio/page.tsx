@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, CalendarCheck2, CalendarClock, Clock3, SendHorizonal, UsersRound } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { FormattedDate } from "@/components/ui/formatted-date";
 import { listSavedGroups } from "@/db/savedGroups";
 import { listScheduledMessages } from "@/db/scheduledMessages";
 import { getOrCreateEvolutionInstance } from "@/db/evolutionInstances";
@@ -17,23 +18,6 @@ const statusCopy: Record<string, { label: string; className: string }> = {
   failed: { label: "Falló", className: "bg-[#fe924b]/12 text-[#ffc69f] border-[#fe924b]/20" },
   cancelled: { label: "Cancelado", className: "bg-white/6 text-slate-300 border-white/10" },
 };
-
-function formatRelativeDate(date: Date | string | null): string {
-  if (!date) return "Sin envíos";
-  const d = new Date(date);
-  const now = new Date();
-  const diffDays = Math.floor((d.getTime() - now.getTime()) / 86400000);
-  if (diffDays === 0) {
-    return `Hoy, ${d.toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" })}`;
-  }
-  if (diffDays === 1) return "Mañana";
-  return d.toLocaleDateString("es-PE", { dateStyle: "medium" });
-}
-
-function formatDate(date: Date | string | null) {
-  if (!date) return "—";
-  return new Date(date).toLocaleString("es-PE", { dateStyle: "medium", timeStyle: "short" });
-}
 
 export default async function InicioPage() {
   const user = await authorizePage();
@@ -93,7 +77,7 @@ export default async function InicioPage() {
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-sm text-slate-400">Próximo envío</p>
-            <p className="mt-0.5 text-2xl font-bold text-white">{formatRelativeDate(nextMessage?.scheduled_for ?? null)}</p>
+            <p className="mt-0.5 text-2xl font-bold text-white"><FormattedDate date={nextMessage?.scheduled_for ?? null} relative fallback="Sin envíos" /></p>
             {nextMessage && (
               <p className="mt-0.5 truncate text-xs text-[#2ae5dc]">{nextMessage.group_name}</p>
             )}
@@ -135,7 +119,7 @@ export default async function InicioPage() {
                     </Badge>
                     <span className="inline-flex items-center gap-1.5 text-xs text-slate-400">
                       <Clock3 className="size-3.5" />
-                      {formatDate(message.scheduled_for)}
+                      <FormattedDate date={message.scheduled_for} />
                     </span>
                   </div>
                 </div>
