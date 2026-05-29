@@ -3,37 +3,17 @@ import type { MessageEntry } from "../seed-messages";
 export const messages: MessageEntry[] = [
   {
     group_id: "b163ab5a-a024-4ce2-a08e-312e43187ab9",
-    scheduled_for: "2026-05-28T13:00:00-05:00",
-    status: "scheduled",
-    content: `🎉✨ ¡Bienvenid@s al cuarto programa de *InspiraTech*! ✨🎉
-
-*No es solo otro programa. Es una revolución de ideas, acción y comunidad.*
-
-🚀 Si estás aquí, es porque crees en el poder de *crear sin límites*, en construir soluciones reales con propósito y tecnología, y en que el impacto no espera… ¡SE CREA!
-
-🌎 Este espacio no es para espectadores, es para *makers, soñadores e inspirers* que quieren dejar huella.
-
-Aquí venimos a *transformar*, con *IA, no-code* y todo lo que tengamos a nuestro alcance.
-
-🧠 Prepárate para romper esquemas, prototipar rápido, conectar con mentes increíbles y ser parte de una comunidad que está revolucionando el ecosistema LATAM 💥
-
-¡InspiraTech 4 empieza ahora!
-
-Let's go, Inspirers ✨`,
-  },
-  {
-    group_id: "b163ab5a-a024-4ce2-a08e-312e43187ab9",
-    scheduled_for: "2026-05-29T13:00:00-05:00",
+    scheduled_for: "2026-05-29T15:00:00-05:00",
     status: "scheduled",
     content: `Hola Inspirers!!!
 
 ¡Bienvenidos al programa 4 de InspiraTech! 🚀 Estamos súper emocionados de tenerlos en esta comunidad de aprendizaje, innovación y crecimiento.
 
-Para empezar, queremos conocernos de manera auténtica. Por eso, los invitamos a presentarse en este muro usando la esta *plantilla como ejemplo de presentación* que dejamos abajo. Pueden tomarse su tiempo, ser creativos, añadir emojis, GIFs o lo que los represente. ¡Queremos conocerlos de verdad!💛
+Para empezar, queremos conocernos de manera auténtica. Por eso, los invitamos a presentarse en el grupo usando la esta *plantilla como ejemplo de presentación* que dejamos abajo. Pueden tomarse su tiempo, ser creativos, añadir emojis, GIFs o lo que los represente. ¡Queremos conocerlos de verdad!💛
 
 💡 *Tip:* lean algunas presentaciones de sus compañeros y déjenles un saludo o comentario. ¡La magia de esta comunidad empieza con la conexión entre ustedes!
 
-### *Plantilla de presentación: 💛🚀*
+*Plantilla de presentación: 💛🚀*
 
 Pueden copiarla y completarla con lo que más los represente (no es necesario todos):
 
@@ -105,9 +85,9 @@ Gracias por participar en la primera sesión. Para seguir mejorando, necesitamos
 Te pedimos que completes estas 2 encuestas hasta hoy día a las 11:59 p.m. Te tomará menos de 3 minutos 🙏
 
 🔗Encuesta Feedback de Sesión 1:
-https://airtable.com/appQSwwBh50GVi2k7/pagMQa1KhdBwymEqA/form
+https://airtable.com/appOeyR0YYocmg8ns/pagMQa1KhdBwymEqA/form
 
-🔗Encuesta de inicio del programa: https://airtable.com/appUU31Gq4ELV7uei/pagPJMykKdceY8EZ3/form
+🔗Encuesta de inicio del programa: https://airtable.com/appOeyR0YYocmg8ns/pagPJMykKdceY8EZ3/form
 Si ya la llenaste, ¡No te preocupes!
 
 Esta semana toca avanzar con nuestro *Entregable 1*. El primer paso para aterrizar su idea y empezar a construirla de forma concreta 🚀
@@ -118,7 +98,7 @@ Esta semana toca avanzar con nuestro *Entregable 1*. El primer paso para aterriz
 2. *Completarla con calma y claridad*
 3. *Subirla a través del siguiente formulario*
 
-🔗 Link del Form: https://airtable.com/appQSwwBh50GVi2k7/pagDwl11SR8Qomc4H/form
+🔗 Link del Form: https://airtable.com/appOeyR0YYocmg8ns/pagDwl11SR8Qomc4H/form
 🕒 Fecha límite: Viernes 05 a las 11:59 p.m. (hora Perú)
 
 ¡Nos vemos en nuestra próxima sesión!`,
@@ -130,7 +110,7 @@ Esta semana toca avanzar con nuestro *Entregable 1*. El primer paso para aterriz
     content: `🎯 ¡Inspirers, llegó el momento de pasar a la acción!
 Buenas tardes, Inspirers! ✨ Espero que hayan tenido un buen martes, y si no, no se preocupen, que la semana aún no se acaba y siempre hay chance de remontarla. 💪
 📌 Recordatorio importante: No olviden subir sus entregables de la primera sesión.
-🔗 Link del Form: https://airtable.com/appQSwwBh50GVi2k7/pagDwl11SR8Qomc4H/form
+🔗 Link del Form: https://airtable.com/appOeyR0YYocmg8ns/pagDwl11SR8Qomc4H/form
 🕒 Fecha límite: Viernes 05 a las 11:59 p. m. (hora Perú)`,
   },
   {
@@ -140,7 +120,7 @@ Buenas tardes, Inspirers! ✨ Espero que hayan tenido un buen martes, y si no, n
     content: `🚨 Reminder rápido, Inspirers:
 Hoy viernes se cierra la entrega de la sesión 1.
 🕒 Deadline: 11:59 p. m.
-🔗 Sube tu avance aquí: https://airtable.com/appQSwwBh50GVi2k7/pagDwl11SR8Qomc4H/form
+🔗 Sube tu avance aquí: https://airtable.com/appOeyR0YYocmg8ns/pagDwl11SR8Qomc4H/form
 💡 No tiene que estar perfecto, solo funcional. ¡A darle forma a tu idea!`,
   },
   {
@@ -196,7 +176,7 @@ Gracias por participar en la segunda sesión. Para seguir mejorando, necesitamos
 Te pedimos que completes la encuesta hasta hoy día a las 11:59 p.m. Te tomará menos de 3 minutos 🙏
 
 🔗Encuesta Feedback de Sesión 2:
-https://airtable.com/appQSwwBh50GVi2k7/pagMQa1KhdBwymEqA/form
+https://airtable.com/appOeyR0YYocmg8ns/pagMQa1KhdBwymEqA/form
 
 El Entregable 2 consiste en compartir el avance de tu prototipo web en lovable.dev. ¡Tu landing toma forma esta semana!
 
@@ -216,7 +196,7 @@ Nos vemos en nuestra próxima sesión!`,
     content: `🎯 ¡Inspirers, llegó el momento de pasar a la acción!
 Buenas tardes! ✨ Espero que hayan tenido un buen martes, y si no, no se preocupen, que la semana aún no se acaba y siempre hay chance de remontarla. 💪
 📌 Recordatorio importante: No olviden subir sus entregables de la segunda sesión.
-🔗 Link del Form: https://airtable.com/appQSwwBh50GVi2k7/pagDwl11SR8Qomc4H/form
+🔗 Link del Form: https://airtable.com/appOeyR0YYocmg8ns/pagDwl11SR8Qomc4H/form
 🕒 Fecha límite: Viernes 12 a las 11:59 p. m. (hora Perú)`,
   },
   {
@@ -226,7 +206,7 @@ Buenas tardes! ✨ Espero que hayan tenido un buen martes, y si no, no se preocu
     content: `🚨 Reminder rápido, Inspirers:
 Hoy viernes se cierra la entrega de la sesión 2.
 🕒 Deadline: 11:59 p. m.
-🔗 Sube tu avance aquí: https://airtable.com/appQSwwBh50GVi2k7/pagDwl11SR8Qomc4H/form
+🔗 Sube tu avance aquí: https://airtable.com/appOeyR0YYocmg8ns/pagDwl11SR8Qomc4H/form
 💡 No tiene que estar perfecto, solo funcional. ¡A darle forma a tu idea!`,
   },
   {
@@ -283,7 +263,7 @@ Gracias por participar en la tercera sesión. Para seguir mejorando, necesitamos
 Te pedimos que completes la encuesta hasta hoy día a las 11:59 p.m. Te tomará menos de 3 minutos 🙏
 
 🔗Encuesta Feedback de Sesión 3:
-https://airtable.com/appQSwwBh50GVi2k7/pagMQa1KhdBwymEqA/form
+https://airtable.com/appOeyR0YYocmg8ns/pagMQa1KhdBwymEqA/form
 
 El Entregable 3 consiste en compartir tu MVP web funcional con lovable u otra herramienta. No te preocupes si no está al 100 %, lo importante es tener un flujo básico funcionando.
 
@@ -308,7 +288,7 @@ Nos vemos en nuestra próxima sesión!`,
     content: `🎯 ¡Inspirers, llegó el momento de pasar a la acción!
 Buenas tardes! ✨ Espero que hayan tenido un buen martes, y si no, no se preocupen, que la semana aún no se acaba y siempre hay chance de remontarla. 💪
 📌 Recordatorio importante: No olviden subir sus entregables de la tercera sesión.
-🔗 Link del Form: https://airtable.com/appQSwwBh50GVi2k7/pagDwl11SR8Qomc4H/form
+🔗 Link del Form: https://airtable.com/appOeyR0YYocmg8ns/pagDwl11SR8Qomc4H/form
 🕒 Fecha límite: Viernes 19 a las 11:59 p. m. (hora Perú)`,
   },
   {
@@ -318,7 +298,7 @@ Buenas tardes! ✨ Espero que hayan tenido un buen martes, y si no, no se preocu
     content: `🚨 Reminder rápido, Inspirers:
 Hoy viernes se cierra la entrega de la sesión 3.
 🕒 Deadline: 11:59 p. m.
-🔗 Sube tu avance aquí: https://airtable.com/appQSwwBh50GVi2k7/pagDwl11SR8Qomc4H/form
+🔗 Sube tu avance aquí: https://airtable.com/appOeyR0YYocmg8ns/pagDwl11SR8Qomc4H/form
 💡 No tiene que estar perfecto, solo funcional. ¡A darle forma a tu idea!`,
   },
   {
@@ -372,7 +352,7 @@ Gracias por participar en la cuarta sesión. Para seguir mejorando, necesitamos 
 Te pedimos que completes la encuesta hasta hoy día a las 11:59 p.m. Te tomará menos de 3 minutos 🙏
 
 🔗Encuesta Feedback de Sesión 4:
-https://airtable.com/appQSwwBh50GVi2k7/pagMQa1KhdBwymEqA/form
+https://airtable.com/appOeyR0YYocmg8ns/pagMQa1KhdBwymEqA/form
 
 ¡Que tengas buen inicio de semana! Nos vemos en nuestra próxima sesión!`,
   },
@@ -431,7 +411,7 @@ Gracias por participar en la quinta sesión. Para seguir mejorando, necesitamos 
 Te pedimos que completes la encuesta hasta hoy día a las 11:59 p.m. Te tomará menos de 3 minutos 🙏
 
 🔗Encuesta Feedback de Sesión 5:
-https://airtable.com/appQSwwBh50GVi2k7/pagMQa1KhdBwymEqA/form
+https://airtable.com/appOeyR0YYocmg8ns/pagMQa1KhdBwymEqA/form
 
 El Entregable 5 consiste en crear tu primera automatización usando n8n (u otra herramienta no-code). Puede ser simple: enviar un mail, guardar datos, mover info.
 
@@ -458,7 +438,7 @@ Nos vemos en nuestra próxima sesión!`,
     content: `🎯 ¡Inspirers, llegó el momento de pasar a la acción!
 Buenas tardes! ✨ Espero que hayan tenido un buen martes, y si no, no se preocupen, que la semana aún no se acaba y siempre hay chance de remontarla. 💪
 📌 Recordatorio importante: No olviden subir sus entregables de la quinta sesión.
-🔗 Link del Form: https://airtable.com/appQSwwBh50GVi2k7/pagDwl11SR8Qomc4H/form
+🔗 Link del Form: https://airtable.com/appOeyR0YYocmg8ns/pagDwl11SR8Qomc4H/form
 🕒 Fecha límite: Viernes 03 de Julio a las 11:59 p. m. (hora Perú)`,
   },
   {
@@ -468,7 +448,7 @@ Buenas tardes! ✨ Espero que hayan tenido un buen martes, y si no, no se preocu
     content: `🚨 Reminder rápido, Inspirers:
 Hoy viernes se cierra la entrega de la sesión 5.
 🕒 Deadline: 11:59 p. m.
-🔗 Sube tu avance aquí: https://airtable.com/appQSwwBh50GVi2k7/pagDwl11SR8Qomc4H/form
+🔗 Sube tu avance aquí: https://airtable.com/appOeyR0YYocmg8ns/pagDwl11SR8Qomc4H/form
 💡 Haz que la tecnología trabaje para ti. ¡Tú puedes!`,
   },
   {
@@ -521,7 +501,7 @@ Gracias por participar en la sexta sesión. Para seguir mejorando, necesitamos t
 Te pedimos que completes la encuesta hasta hoy día a las 11:59 p.m. Te tomará menos de 3 minutos 🙏
 
 🔗Encuesta Feedback de Sesión 6:
-https://airtable.com/appQSwwBh50GVi2k7/pagMQa1KhdBwymEqA/form
+https://airtable.com/appOeyR0YYocmg8ns/pagMQa1KhdBwymEqA/form
 
 El Entregable 6 consiste en crear una automatización conectando herramientas reales: WhatsApp, Telegram, Airtable, formularios, APIs… tú eliges.
 
@@ -548,7 +528,7 @@ Nos vemos en nuestra próxima sesión!`,
     content: `🎯 ¡Inspirers, llegó el momento de pasar a la acción!
 Buenas tardes! ✨ Espero que hayan tenido un buen martes, y si no, no se preocupen, que la semana aún no se acaba y siempre hay chance de remontarla. 💪
 📌 Recordatorio importante: No olviden subir sus entregables de la sexta sesión.
-🔗 Link del Form: https://airtable.com/appQSwwBh50GVi2k7/pagDwl11SR8Qomc4H/form
+🔗 Link del Form: https://airtable.com/appOeyR0YYocmg8ns/pagDwl11SR8Qomc4H/form
 🕒 Fecha límite: Viernes 10 de Julio a las 11:59 p. m. (hora Perú)`,
   },
   {
@@ -558,7 +538,7 @@ Buenas tardes! ✨ Espero que hayan tenido un buen martes, y si no, no se preocu
     content: `🚨 Reminder rápido, Inspirers:
 Hoy viernes se cierra la entrega de la sesión 6.
 🕒 Deadline: 11:59 p. m.
-🔗 Sube tu avance aquí: https://airtable.com/appQSwwBh50GVi2k7/pagDwl11SR8Qomc4H/form
+🔗 Sube tu avance aquí: https://airtable.com/appOeyR0YYocmg8ns/pagDwl11SR8Qomc4H/form
 💡 Impactar es conectar. Lo que estás automatizando puede transformar cómo alguien vive un problema. ¡Lo lograste!`,
   },
   {
@@ -614,7 +594,7 @@ Gracias por participar en la séptima sesión. Para seguir mejorando, necesitamo
 Te pedimos que completes la encuesta hasta hoy día a las 11:59 p.m. Te tomará menos de 3 minutos 🙏
 
 🔗Encuesta Feedback de Sesión 7:
-https://airtable.com/appQSwwBh50GVi2k7/pagMQa1KhdBwymEqA/form
+https://airtable.com/appOeyR0YYocmg8ns/pagMQa1KhdBwymEqA/form
 
 El Entregable 7 es tu pitch. Pero no estás solo/a: tendrás ayuda de la IA y el feedback de tus compañeros.
 
@@ -640,7 +620,7 @@ Si tienen cualquier duda o consulta, ¡me escriben sin problema! Estamos para ap
     content: `🎯 ¡Inspirers, llegó el momento de pasar a la acción!
 Buenas tardes! ✨ Espero que hayan tenido un buen martes, y si no, no se preocupen, que la semana aún no se acaba y siempre hay chance de remontarla. 💪
 📌 Recordatorio importante: No olviden subir sus entregables de la séptima sesión (el pitch).
-🔗 Link del Form: https://airtable.com/appQSwwBh50GVi2k7/pagDwl11SR8Qomc4H/form
+🔗 Link del Form: https://airtable.com/appOeyR0YYocmg8ns/pagDwl11SR8Qomc4H/form
 🕒 Fecha límite: Viernes 17 de Julio a las 11:59 p. m. (hora Perú)`,
   },
   {
@@ -650,7 +630,7 @@ Buenas tardes! ✨ Espero que hayan tenido un buen martes, y si no, no se preocu
     content: `🚨 Reminder rápido, Inspirers:
 Hoy viernes se cierra la entrega del pitch (sesión 7).
 🕒 Deadline: 11:59 p. m.
-🔗 Sube tu avance aquí: https://airtable.com/appQSwwBh50GVi2k7/pagDwl11SR8Qomc4H/form
+🔗 Sube tu avance aquí: https://airtable.com/appOeyR0YYocmg8ns/pagDwl11SR8Qomc4H/form
 💡 Aquí no buscamos oradores perfectos, sino historias honestas. ¡Lo que estás creando vale la pena ser contado!`,
   },
   {
@@ -708,7 +688,7 @@ Para seguir mejorando, necesitamos tu feedback 🙌
 Te pedimos que completes la encuesta hasta hoy día a las 11:59 p.m. Te tomará menos de 3 minutos 🙏
 
 🔗Encuesta Feedback del Demo Day:
-https://airtable.com/appQSwwBh50GVi2k7/pagMQa1KhdBwymEqA/form
+https://airtable.com/appOeyR0YYocmg8ns/pag2dYoL5lAAtBG2X/form
 
 ¡Que tengas buen inicio de semana! Fue un honor compartir este camino con ustedes. ✨`,
   },
