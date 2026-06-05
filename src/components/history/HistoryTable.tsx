@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { SquarePen } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import type { SavedGroup } from "@/db/savedGroups";
 import type { HistoryMessage } from "@/db/scheduledMessages";
+import EditMessageModal from "./EditMessageModal";
 
 const STATUS_STYLES: Record<string, { label: string; className: string }> = {
   scheduled: { label: "Programado", className: "bg-[#2ae5dc]/12 text-[#8ef7f1] border-[#2ae5dc]/20" },
@@ -24,10 +27,13 @@ function formatDatetime(date: Date | string | null) {
 
 interface HistoryTableProps {
   rows: HistoryMessage[];
+  activeGroups: SavedGroup[];
+  onUpdated: () => void;
 }
 
-export default function HistoryTable({ rows }: HistoryTableProps) {
+export default function HistoryTable({ rows, activeGroups, onUpdated }: HistoryTableProps) {
   const [selected, setSelected] = useState<HistoryMessage | null>(null);
+  const [editing, setEditing] = useState<HistoryMessage | null>(null);
 
   if (rows.length === 0) {
     return (
@@ -51,6 +57,7 @@ export default function HistoryTable({ rows }: HistoryTableProps) {
               <TableHead className="text-xs uppercase tracking-[0.24em] text-slate-400 whitespace-nowrap">Programado para</TableHead>
               <TableHead className="text-xs uppercase tracking-[0.24em] text-slate-400 whitespace-nowrap">Enviado a las</TableHead>
               <TableHead className="text-xs uppercase tracking-[0.24em] text-slate-400">Estado</TableHead>
+              <TableHead className="text-xs uppercase tracking-[0.24em] text-slate-400 text-right">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -63,11 +70,25 @@ export default function HistoryTable({ rows }: HistoryTableProps) {
                   onClick={() => canShowDetail(message) && setSelected(message)}
                 >
                   <TableCell className="font-mono text-xs text-slate-300">{message.group_name}</TableCell>
-                  <TableCell className="max-w-xs text-sm text-white whitespace-normal">{message.message_preview}</TableCell>
+                  <TableCell className="max-w-xs">
+                    <p className="line-clamp-2 whitespace-normal break-words text-sm text-white">{message.content}</p>
+                  </TableCell>
                   <TableCell className="font-mono text-xs text-slate-400">{formatDatetime(message.scheduled_for)}</TableCell>
                   <TableCell className="font-mono text-xs text-slate-400">{formatDatetime(message.sent_at)}</TableCell>
                   <TableCell>
                     <Badge className={status.className}>{status.label}</Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {message.status === "scheduled" ? (
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); setEditing(message); }}
+                        aria-label="Editar mensaje"
+                        className="inline-flex size-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-[#2ae5dc] transition-colors hover:bg-[#2ae5dc]/15"
+                      >
+                        <SquarePen className="size-4" />
+                      </button>
+                    ) : null}
                   </TableCell>
                 </TableRow>
               );
@@ -103,6 +124,16 @@ export default function HistoryTable({ rows }: HistoryTableProps) {
           ) : null}
         </DialogContent>
       </Dialog>
+
+      <EditMessageModal
+        message={editing}
+        activeGroups={activeGroups}
+        onClose={() => setEditing(null)}
+        onSaved={() => {
+          setEditing(null);
+          onUpdated();
+        }}
+      />
     </>
   );
 }

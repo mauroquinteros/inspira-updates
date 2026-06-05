@@ -129,10 +129,31 @@ export async function cancelMessage(
   return rows[0] ?? null;
 }
 
+export async function updateScheduledMessage(
+  user_id: string,
+  id: string,
+  fields: { group_id: string; content: string; scheduled_for: Date }
+): Promise<ScheduledMessage | null> {
+  const rows = await db<ScheduledMessage[]>`
+    UPDATE scheduled_messages
+    SET
+      group_id = ${fields.group_id},
+      content = ${fields.content},
+      scheduled_for = ${fields.scheduled_for},
+      updated_at = NOW()
+    WHERE id = ${id}
+      AND user_id = ${user_id}
+      AND status = 'scheduled'
+    RETURNING *
+  `;
+  return rows[0] ?? null;
+}
+
 export type HistoryMessage = {
   id: string;
+  group_id: string;
   group_name: string;
-  message_preview: string;
+  content: string;
   scheduled_for: Date;
   sent_at: Date | null;
   status: string;
@@ -147,8 +168,9 @@ export async function listHistoryMessages(
   return await db<HistoryMessage[]>`
     SELECT
       sm.id,
+      sm.group_id,
       sg.group_name,
-      LEFT(sm.content, 80) AS message_preview,
+      sm.content,
       sm.scheduled_for,
       sm.sent_at,
       sm.status,

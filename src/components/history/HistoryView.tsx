@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Activity, History } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
@@ -8,28 +8,46 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import StatusFilter from "./StatusFilter";
 import HistoryTable from "./HistoryTable";
+import type { SavedGroup } from "@/db/savedGroups";
 import type { HistoryMessage } from "@/db/scheduledMessages";
 
 interface HistoryViewProps {
   initialMessages: HistoryMessage[];
+  activeGroups: SavedGroup[];
   status?: string;
 }
 
-export default function HistoryView({ initialMessages, status }: HistoryViewProps) {
+export default function HistoryView({ initialMessages, activeGroups, status }: HistoryViewProps) {
   const [messages, setMessages] = useState<HistoryMessage[]>(initialMessages);
   const [loading, setLoading] = useState(false);
   const searchParams = useSearchParams();
 
-  useEffect(() => {
+  const historyUrl = useCallback(() => {
     const currentStatus = searchParams.get("status") ?? undefined;
-    const url = currentStatus ? `/api/history?status=${currentStatus}` : "/api/history";
+    return currentStatus ? `/api/history?status=${currentStatus}` : "/api/history";
+  }, [searchParams]);
 
+  // Refetch manual (tras editar un mensaje), reutilizable desde la tabla.
+  const reload = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(historyUrl());
+      const data: HistoryMessage[] = await res.json();
+      setMessages(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }, [historyUrl]);
+
+  useEffect(() => {
     let cancelled = false;
 
     async function load() {
       setLoading(true);
       try {
-        const res = await fetch(url);
+        const res = await fetch(historyUrl());
         const data: HistoryMessage[] = await res.json();
         if (!cancelled) setMessages(data);
       } catch (error) {
@@ -44,7 +62,7 @@ export default function HistoryView({ initialMessages, status }: HistoryViewProp
     return () => {
       cancelled = true;
     };
-  }, [searchParams]);
+  }, [historyUrl]);
 
   return (
     <div className="space-y-5">
@@ -80,7 +98,7 @@ export default function HistoryView({ initialMessages, status }: HistoryViewProp
         <CardContent className="space-y-5">
           <StatusFilter currentStatus={status} />
           <div className={loading ? "opacity-60 pointer-events-none transition-opacity" : "transition-opacity"}>
-            <HistoryTable rows={messages} />
+            <HistoryTable rows={messages} activeGroups={activeGroups} onUpdated={reload} />
           </div>
           <div className="inline-flex items-center gap-2 text-xs text-slate-400">
             <Activity className="size-3.5" />
