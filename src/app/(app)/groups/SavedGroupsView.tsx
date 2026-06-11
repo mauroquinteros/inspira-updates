@@ -7,6 +7,7 @@ import type { SavedGroup } from "@/db/savedGroups";
 import SavedGroupsList from "./SavedGroupsList";
 import AddGroupModal from "./AddGroupModal";
 import { Button } from "@/components/ui/button";
+import ConfirmDialog from "@/components/ui/confirm-dialog";
 
 interface Props {
   initialGroups: SavedGroup[];
@@ -33,6 +34,7 @@ const FEATURE_CARDS = [
 export default function SavedGroupsView({ initialGroups }: Props) {
   const [groups, setGroups] = useState<SavedGroup[]>(initialGroups);
   const [modalOpen, setModalOpen] = useState(false);
+  const [confirmTarget, setConfirmTarget] = useState<{ id: string; pendingCount: number } | null>(null);
 
   function handleAdd(group: SavedGroup) {
     setGroups((prev) => [group, ...prev]);
@@ -50,8 +52,26 @@ export default function SavedGroupsView({ initialGroups }: Props) {
   }
 
   async function handleRemove(id: string) {
+    // Step 1 (read): how many pending messages will archiving cancel?
+    let pendingCount = 0;
+    const countRes = await fetch(`/api/saved-groups/${id}`);
+    if (countRes.ok) {
+      const data = (await countRes.json()) as { pendingCount?: number };
+      pendingCount = data.pendingCount ?? 0;
+    }
+
+    // Step 2 (confirm): open the branded dialog with the pending count.
+    setConfirmTarget({ id, pendingCount });
+  }
+
+  // Step 3 (mutate): archive + cancel pending, atomic on the server.
+  // Throws on failure so ConfirmDialog keeps itself open and shows the error.
+  async function confirmRemove(id: string) {
     const res = await fetch(`/api/saved-groups/${id}`, { method: "DELETE" });
-    if (!res.ok) return;
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error ?? "No pudimos archivar el grupo.");
+    }
     setGroups((prev) => prev.filter((g) => g.id !== id));
   }
 
@@ -94,6 +114,21 @@ export default function SavedGroupsView({ initialGroups }: Props) {
       </div>
 
       <AddGroupModal open={modalOpen} onClose={() => setModalOpen(false)} onAdd={handleAdd} />
+
+      <ConfirmDialog
+        open={confirmTarget !== null}
+        onOpenChange={(open) => !open && setConfirmTarget(null)}
+        title="Archivar grupo"
+        description={
+          confirmTarget && confirmTarget.pendingCount > 0
+            ? `Este grupo tiene ${confirmTarget.pendingCount} mensaje${confirmTarget.pendingCount === 1 ? "" : "s"} programado${confirmTarget.pendingCount === 1 ? "" : "s"} que se cancelará${confirmTarget.pendingCount === 1 ? "" : "n"}. ¿Archivar el grupo de todas formas?`
+            : "¿Archivar este grupo? Podrás volver a agregarlo más tarde y su historial se conserva."
+        }
+        confirmLabel="Archivar"
+        onConfirm={() => {
+          if (confirmTarget) return confirmRemove(confirmTarget.id);
+        }}
+      />
     </div>
   );
 }

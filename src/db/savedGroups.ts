@@ -7,6 +7,7 @@ export interface SavedGroup {
   group_name: string;
   is_active: boolean;
   created_at: Date;
+  deleted_at: Date | null;
 }
 
 export async function insertSavedGroup(
@@ -18,25 +19,21 @@ export async function insertSavedGroup(
   const group_jid = maybe_group_name ? group_jid_or_group_name : user_id_or_group_jid;
   const group_name = maybe_group_name ?? group_jid_or_group_name;
 
-  try {
-    const rows = await db<SavedGroup[]>`
-      INSERT INTO saved_groups (user_id, group_jid, group_name, is_active)
-      VALUES (${user_id}, ${group_jid}, ${group_name}, true)
-      RETURNING *
-    `;
-    return rows[0] ?? null;
-  } catch (err: unknown) {
-    // Postgres unique_violation error code = 23505
-    if (
-      err &&
-      typeof err === "object" &&
-      "code" in err &&
-      (err as { code: string }).code === "23505"
-    ) {
-      return null;
-    }
-    throw err;
-  }
+  // Upsert with resurrection: a brand-new group is inserted; re-adding a group
+  // that was archived (soft-deleted) un-archives it and returns the revived row.
+  // Re-adding a group that is already active hits the ON CONFLICT WHERE guard,
+  // which updates nothing and returns no row -> null -> caller responds 409.
+  const rows = await db<SavedGroup[]>`
+    INSERT INTO saved_groups (user_id, group_jid, group_name, is_active)
+    VALUES (${user_id}, ${group_jid}, ${group_name}, true)
+    ON CONFLICT (user_id, group_jid) DO UPDATE
+      SET deleted_at = NULL,
+          is_active = true,
+          group_name = EXCLUDED.group_name
+      WHERE saved_groups.deleted_at IS NOT NULL
+    RETURNING *
+  `;
+  return rows[0] ?? null;
 }
 
 export async function listSavedGroups(user_id?: string): Promise<SavedGroup[]> {
@@ -45,6 +42,7 @@ export async function listSavedGroups(user_id?: string): Promise<SavedGroup[]> {
       SELECT *
       FROM saved_groups
       WHERE user_id = ${user_id}
+        AND deleted_at IS NULL
       ORDER BY created_at DESC
     `;
   }
@@ -52,6 +50,7 @@ export async function listSavedGroups(user_id?: string): Promise<SavedGroup[]> {
   return db<SavedGroup[]>`
     SELECT *
     FROM saved_groups
+    WHERE deleted_at IS NULL
     ORDER BY created_at DESC
   `;
 }
@@ -86,22 +85,50 @@ export async function toggleSavedGroup(
   return rows[0] ?? null;
 }
 
-export async function deleteSavedGroup(
-  user_id_or_id: string,
-  maybe_id?: string
-): Promise<boolean> {
-  const user_id = maybe_id ? user_id_or_id : null;
-  const id = maybe_id ?? user_id_or_id;
+/** Counts a group's pending ('scheduled') messages — the ones archiving will cancel. */
+export async function countPendingMessages(
+  user_id: string,
+  group_id: string
+): Promise<number> {
+  const rows = await db<{ count: number }[]>`
+    SELECT COUNT(*)::int AS count
+    FROM scheduled_messages
+    WHERE group_id = ${group_id}
+      AND user_id = ${user_id}
+      AND status = 'scheduled'
+  `;
+  return rows[0]?.count ?? 0;
+}
 
-  const result = user_id
-    ? await db`
-        DELETE FROM saved_groups
-        WHERE id = ${id}
-          AND user_id = ${user_id}
-      `
-    : await db`
-        DELETE FROM saved_groups
-        WHERE id = ${id}
-      `;
-  return result.count > 0;
+/**
+ * Soft-deletes (archives) a group and cancels its pending messages atomically.
+ * Returns false if no active group matched (already archived or not owned).
+ * Sent/failed/cancelled messages are left untouched so History stays intact.
+ */
+export async function archiveSavedGroup(
+  user_id: string,
+  id: string
+): Promise<boolean> {
+  return db.begin(async (sql) => {
+    const archived = await sql`
+      UPDATE saved_groups
+      SET deleted_at = NOW()
+      WHERE id = ${id}
+        AND user_id = ${user_id}
+        AND deleted_at IS NULL
+    `;
+
+    if (archived.count === 0) return false;
+
+    await sql`
+      UPDATE scheduled_messages
+      SET status = 'cancelled',
+          updated_at = NOW()
+      WHERE group_id = ${id}
+        AND user_id = ${user_id}
+        AND status = 'scheduled'
+    `;
+
+    return true;
+  });
 }

@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 
-import { deleteSavedGroup, toggleSavedGroup } from "@/db/savedGroups";
+import { archiveSavedGroup, countPendingMessages, toggleSavedGroup } from "@/db/savedGroups";
 import { authorizeRoute } from "@/lib/authorizeRoute";
+
+export const GET = authorizeRoute<{ id: string }>(async ({ user, params }) => {
+  const { id } = await params;
+  const pendingCount = await countPendingMessages(user.id, id);
+  return NextResponse.json({ pendingCount });
+}, { logLabel: "[GET /api/saved-groups/[id]]" });
 
 export const PATCH = authorizeRoute<{ id: string }>(async ({ request, user, params }) => {
   const { id } = await params;
@@ -18,8 +24,8 @@ export const PATCH = authorizeRoute<{ id: string }>(async ({ request, user, para
 
 export const DELETE = authorizeRoute<{ id: string }>(async ({ user, params }) => {
   const { id } = await params;
-  const deleted = await deleteSavedGroup(user.id, id);
-  if (!deleted) {
+  const archived = await archiveSavedGroup(user.id, id);
+  if (!archived) {
     return NextResponse.json({ error: "No encontramos el grupo solicitado." }, { status: 404 });
   }
 

@@ -88,7 +88,7 @@ export default function SavedGroupsList({ groups, onToggle, onRemove }: Props) {
                   className="inline-flex items-center gap-1.5 text-sm text-[#fe924b] transition-colors hover:text-orange-300 disabled:opacity-50"
                 >
                   <Trash2 className="size-3.5" />
-                  {loadingRemove === group.id ? "Eliminando..." : "Eliminar"}
+                  Eliminar
                 </button>
               </div>
             </div>
