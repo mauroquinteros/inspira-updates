@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getOrCreateEvolutionInstance } from "@/db/evolutionInstances";
 import { authorizeRoute } from "@/lib/authorizeRoute";
-import { fetchAllGroups, getConnectionState } from "@/lib/evolutionClient";
+import { fetchGroupsViaChats, getConnectionState } from "@/lib/evolutionClient";
 
 export const GET = authorizeRoute(async ({ user }) => {
   const instance = await getOrCreateEvolutionInstance(user.id);
@@ -12,7 +12,7 @@ export const GET = authorizeRoute(async ({ user }) => {
     return NextResponse.json({ error: "Tu sesión de WhatsApp aún no está conectada." }, { status: 503 });
   }
 
-  const groups = await fetchAllGroups(instance.instance_name);
+  const groups = await fetchGroupsViaChats(instance.instance_name);
   return NextResponse.json(groups);
 }, {
   logLabel: "[GET /api/whatsapp/groups]",

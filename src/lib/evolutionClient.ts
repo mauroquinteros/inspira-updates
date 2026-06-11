@@ -90,6 +90,31 @@ export async function fetchAllGroups(
   }));
 }
 
+export async function fetchGroupsViaChats(
+  instanceName: string
+): Promise<EvolutionGroup[]> {
+  const res = await fetch(
+    `${env.EVOLUTION_API_BASE_URL}/chat/findChats/${encodeURIComponent(instanceName)}`,
+    { method: "POST", headers: headers(), body: JSON.stringify({}) }
+  );
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`fetchGroupsViaChats failed: ${res.status} ${body}`);
+  }
+
+  const data = await res.json();
+  const chats: Array<{ remoteJid?: string; pushName?: string | null }> =
+    Array.isArray(data) ? data : [];
+
+  return chats
+    .filter((c) => c.remoteJid?.endsWith("@g.us") && c.pushName)
+    .map((c) => ({
+      jid: c.remoteJid as string,
+      name: c.pushName as string,
+    }));
+}
+
 export async function sendTextMessage(
   instanceName: string,
   groupJid: string,
